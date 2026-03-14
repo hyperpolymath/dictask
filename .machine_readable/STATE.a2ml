@@ -1,0 +1,57 @@
+# SPDX-License-Identifier: PMPL-1.0-or-later
+# Copyright (c) 2026 Jonathan D.A. Jewell (hyperpolymath) <j.d.a.jewell@open.ac.uk>
+#
+# STATE.a2ml — Project state checkpoint for dictask
+
+[metadata]
+project = "dictask"
+version = "0.1.0"
+last-updated = "2026-03-13"
+status = "active"  # active | paused | archived
+
+[project-context]
+name = "dictask"
+purpose = "Speech-to-do pipeline: automate ingestion of speech notes from a portable recorder into a structured, prioritised, auditable task list with local-first storage and optional cloud sync."
+completion-percentage = 5
+
+[position]
+phase = "design"           # design | implementation | testing | maintenance | archived
+maturity = "experimental"  # experimental | alpha | beta | production | lts
+
+[route-to-mvp]
+milestones = [
+  { name = "Phase 0: Architecture & schema design", completion = 80 },
+  { name = "Phase 1: Canonical task store (SQLite schema + Idris2 ABI proofs)", completion = 0 },
+  { name = "Phase 2: Ingest pipeline (udev → archive → cloud backup)", completion = 0 },
+  { name = "Phase 3: Transcription engine (Rust + Whisper/Vosk)", completion = 0 },
+  { name = "Phase 4: Haskell NLP parser (megaparsec task extraction)", completion = 0 },
+  { name = "Phase 5: Confidence scoring & ambiguity handling", completion = 0 },
+  { name = "Phase 6: Deduplication engine (exact + semantic matching)", completion = 0 },
+  { name = "Phase 7: Review queue & notification system", completion = 0 },
+  { name = "Phase 8: View generation (Markdown, JSON, CSV)", completion = 0 },
+  { name = "Phase 9: Ansible/Terraform deployment", completion = 0 },
+  { name = "Phase 10: Privacy & audit trail hardening", completion = 0 },
+]
+
+[blockers-and-issues]
+# No active blockers — design phase
+
+[critical-next-actions]
+actions = [
+  "Finalise SQLite schema and write Idris2 ABI proofs for Task type",
+  "Prototype Haskell parser with megaparsec for basic intent extraction",
+  "Set up udev rule for portable recorder detection",
+  "Create Ansible playbook for local machine setup",
+  "Choose ASR engine: Whisper (accuracy) vs Vosk (speed/offline)",
+]
+
+[maintenance-status]
+last-run-utc = "never"
+last-report = "docs/reports/maintenance/latest.json"
+last-result = "unknown"  # unknown | pass | warn | fail
+open-warnings = 0
+open-failures = 0
+
+[ecosystem]
+part-of = ["hyperpolymath tooling", "ambientops"]
+depends-on = ["whisper-rs", "vosk", "megaparsec", "sqlite", "stapeln"]

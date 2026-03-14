@@ -1,0 +1,50 @@
+# SPDX-License-Identifier: PMPL-1.0-or-later
+# Copyright (c) 2026 Jonathan D.A. Jewell (hyperpolymath) <j.d.a.jewell@open.ac.uk>
+#
+# ECOSYSTEM.a2ml — Project ecosystem position for dictask
+
+[metadata]
+version = "0.1.0"
+last-updated = "2026-03-13"
+
+[project]
+name = "dictask"
+purpose = "Speech-to-do pipeline: portable recorder → transcription → NLP parsing → prioritised task list"
+role = "service"  # ffi-infrastructure, cli-tool, library, service
+
+[position-in-ecosystem]
+tier = "2"  # 1 | 2 | infrastructure
+
+[related-projects]
+projects = [
+  { name = "ambientops", relationship = "sibling-standard", notes = "Personal sysadmin/automation — dictask is an ambientops workflow" },
+  { name = "proven", relationship = "dependency", notes = "Formally verified safety modules for audio processing and crypto" },
+  { name = "verisimdb", relationship = "potential-consumer", notes = "Could back canonical store for federation/replication" },
+  { name = "panll", relationship = "potential-consumer", notes = "Review queue could surface as a PanLL panel" },
+  { name = "hypatia", relationship = "dependency", notes = "CI/CD scanning for the pipeline" },
+  { name = "gitbot-fleet", relationship = "dependency", notes = "Bot orchestration for automated pipeline steps" },
+  { name = "stapeln", relationship = "dependency", notes = "Container ecosystem for deployment" },
+]
+
+[integration-points]
+integrations = [
+  { system = "udev/systemd", direction = "inbound", protocol = "device-event", notes = "Detects portable recorder USB insertion" },
+  { system = "cloud-storage", direction = "outbound", protocol = "s3-compatible", notes = "Encrypted backup of raw audio" },
+  { system = "whisper/vosk", direction = "internal", protocol = "library-call", notes = "Offline ASR transcription" },
+  { system = "sqlite", direction = "internal", protocol = "sql", notes = "Canonical task store" },
+  { system = "gitbot-fleet", direction = "outbound", protocol = "repository_dispatch", notes = "Notifications for review items" },
+]
+
+[data-flow]
+pipeline = [
+  "Recorder USB → udev/systemd trigger",
+  "Raw audio → local archive (SHA-256 checksummed)",
+  "Archive → encrypted cloud backup (retry 3x / quarantine)",
+  "Audio → Whisper/Vosk transcription → transcript JSON",
+  "Transcript → Haskell megaparsec NLP → candidate intents (JSON with confidence)",
+  "Candidates → normalise/validate → resolve dates, assign priority",
+  "Normalised → deduplication (exact + semantic) → merge/link",
+  "Deduplicated → review queue (low confidence) or auto-apply (high confidence)",
+  "Canonical store (SQLite) → derived views (Markdown, JSON, CSV)",
+  "Review items → notification (dashboard/email)",
+]

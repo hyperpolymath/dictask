@@ -1,0 +1,120 @@
+# SPDX-License-Identifier: PMPL-1.0-or-later
+# Copyright (c) 2026 Jonathan D.A. Jewell (hyperpolymath) <j.d.a.jewell@open.ac.uk>
+#
+# Ansible playbook for local dictask pipeline setup.
+# Sets up: udev rules, systemd service, Rust/Haskell toolchains, SQLite.
+---
+- name: Setup dictask speech-to-do pipeline
+  hosts: localhost
+  connection: local
+  become: false
+
+  vars:
+    dictask_dir: "{{ ansible_env.HOME }}/Documents/hyperpolymath-repos/dictask"
+    dictask_data_dir: "{{ ansible_env.HOME }}/.local/share/dictask"
+    dictask_archive_dir: "{{ dictask_data_dir }}/audio-archive"
+    dictask_db_path: "{{ dictask_data_dir }}/tasks.db"
+    # Portable recorder USB identifiers (customise for your device)
+    recorder_vendor_id: "XXXX"
+    recorder_product_id: "XXXX"
+
+  tasks:
+    # ========================================================================
+    # Directory setup
+    # ========================================================================
+    - name: Create dictask data directories
+      file:
+        path: "{{ item }}"
+        state: directory
+        mode: "0750"
+      loop:
+        - "{{ dictask_data_dir }}"
+        - "{{ dictask_archive_dir }}"
+        - "{{ dictask_data_dir }}/transcripts"
+        - "{{ dictask_data_dir }}/candidates"
+        - "{{ dictask_data_dir }}/views"
+        - "{{ dictask_data_dir }}/quarantine"
+        - "{{ dictask_data_dir }}/logs"
+
+    # ========================================================================
+    # Initialise SQLite database
+    # ========================================================================
+    - name: Check if SQLite database exists
+      stat:
+        path: "{{ dictask_db_path }}"
+      register: db_stat
+
+    - name: Initialise SQLite database from schema
+      command: sqlite3 "{{ dictask_db_path }}" ".read {{ dictask_dir }}/schemas/tasks.sql"
+      when: not db_stat.stat.exists
+
+    # ========================================================================
+    # udev rule for recorder detection
+    # ========================================================================
+    - name: Install udev rule for portable recorder
+      become: true
+      copy:
+        dest: /etc/udev/rules.d/99-dictask-recorder.rules
+        content: |
+          # dictask: trigger pipeline when portable voice recorder is connected
+          # Customise VENDOR_ID and PRODUCT_ID for your recorder
+          # Find yours with: lsusb
+          ACTION=="add", SUBSYSTEM=="usb", ATTR{idVendor}=="{{ recorder_vendor_id }}", ATTR{idProduct}=="{{ recorder_product_id }}", TAG+="systemd", ENV{SYSTEMD_WANTS}="dictask-ingest.service"
+        mode: "0644"
+      notify: Reload udev rules
+
+    # ========================================================================
+    # systemd service for pipeline
+    # ========================================================================
+    - name: Install dictask systemd user service
+      copy:
+        dest: "{{ ansible_env.HOME }}/.config/systemd/user/dictask-ingest.service"
+        content: |
+          [Unit]
+          Description=dictask speech-to-do pipeline ingest
+          After=local-fs.target
+
+          [Service]
+          Type=oneshot
+          ExecStart={{ dictask_dir }}/target/release/dictask-ingest
+          Environment=DICTASK_DATA_DIR={{ dictask_data_dir }}
+          Environment=DICTASK_DB_PATH={{ dictask_db_path }}
+          StandardOutput=append:{{ dictask_data_dir }}/logs/ingest.log
+          StandardError=append:{{ dictask_data_dir }}/logs/ingest-error.log
+
+          [Install]
+          WantedBy=default.target
+        mode: "0644"
+      notify: Reload systemd user daemon
+
+    - name: Install dictask systemd timer (periodic batch check)
+      copy:
+        dest: "{{ ansible_env.HOME }}/.config/systemd/user/dictask-batch.timer"
+        content: |
+          [Unit]
+          Description=dictask periodic batch processing
+
+          [Timer]
+          OnCalendar=*:0/15
+          Persistent=true
+
+          [Install]
+          WantedBy=timers.target
+        mode: "0644"
+
+    - name: Enable dictask batch timer
+      systemd:
+        name: dictask-batch.timer
+        scope: user
+        enabled: true
+        state: started
+
+  handlers:
+    - name: Reload udev rules
+      become: true
+      command: udevadm control --reload-rules && udevadm trigger
+
+    - name: Reload systemd user daemon
+      systemd:
+        daemon_reload: true
+        scope: user

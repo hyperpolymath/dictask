@@ -1,0 +1,17 @@
+# SPDX-License-Identifier: PMPL-1.0-or-later
+[package]
+name = "dictask-transcribe"
+version = "0.1.0"
+edition = "2024"
+authors = ["Jonathan D.A. Jewell <j.d.a.jewell@open.ac.uk>"]
+description = "Offline ASR transcription for dictask (Whisper/Vosk)"
+license = "LicenseRef-PMPL-1.0-or-later"
+
+[dependencies]
+anyhow = "1"
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+tokio = { version = "1", features = ["full"] }
+tracing = "0.1"
+uuid = { version = "1", features = ["v7"] }
+# whisper-rs = "0.12"  # Uncomment when ready to integrate

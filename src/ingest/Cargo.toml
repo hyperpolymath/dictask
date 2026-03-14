@@ -1,0 +1,17 @@
+# SPDX-License-Identifier: PMPL-1.0-or-later
+[package]
+name = "dictask-ingest"
+version = "0.1.0"
+edition = "2024"
+authors = ["Jonathan D.A. Jewell <j.d.a.jewell@open.ac.uk>"]
+description = "Device detection, audio archival, and cloud backup for dictask"
+license = "LicenseRef-PMPL-1.0-or-later"
+
+[dependencies]
+anyhow = "1"
+sha2 = "0.10"
+tokio = { version = "1", features = ["full"] }
+tracing = "0.1"
+tracing-subscriber = "0.3"
+uuid = { version = "1", features = ["v7"] }
+walkdir = "2"

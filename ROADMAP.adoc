@@ -1,0 +1,54 @@
+// SPDX-License-Identifier: PMPL-1.0-or-later
+= dictask Roadmap
+:toc:
+
+== Current Status
+
+Design phase — architecture specified, implementation starting.
+
+== Milestones
+
+=== v0.1.0 — Prototype (MVP)
+
+* [ ] SQLite schema finalised with Idris2 ABI proofs
+* [ ] Haskell megaparsec parser: basic intent extraction (task title, deadline, priority keywords)
+* [ ] Rust ingest: udev detection + local archive with SHA-256 checksums
+* [ ] Manual pipeline: ingest → transcribe → parse → store (no automation)
+* [ ] Basic view generation (Markdown task list from SQLite)
+
+=== v0.2.0 — Automated Pipeline
+
+* [ ] systemd service for automatic ingest on recorder insertion
+* [ ] Whisper/Vosk integration for offline transcription
+* [ ] Confidence scoring with configurable thresholds
+* [ ] Review queue for low-confidence items
+* [ ] Cloud backup with retry/quarantine
+
+=== v0.3.0 — Intelligence
+
+* [ ] Semantic deduplication (fuzzy matching + context)
+* [ ] Priority scoring formula: `urgency * 0.5 + importance * 0.3 + deadline_proximity * 0.2`
+* [ ] Tentative deadline resolution ("after Easter" → flag for review)
+* [ ] Contradictory update detection
+
+=== v0.4.0 — Deployment & Hardening
+
+* [ ] Ansible playbook for full local setup
+* [ ] Terraform for cloud provisioning
+* [ ] Full audit trail (audio hash → transcript → parse → task)
+* [ ] Privacy hardening (redaction, encrypted storage)
+* [ ] Containerised deployment via Stapeln
+
+=== v1.0.0 — Stable Release
+
+* [ ] All pipeline stages idempotent and replayable
+* [ ] Comprehensive test suite (HSpec, cargo test, property-based)
+* [ ] PanLL panel for review queue (if applicable)
+* [ ] Documentation complete
+* [ ] Success metrics dashboard
+
+== Future Directions
+
+* Train a model on historical edits to refine confidence scoring
+* VeriSimDB backing store for federation/replication
+* Multi-format export (Org-mode, Taskwarrior, iCal)

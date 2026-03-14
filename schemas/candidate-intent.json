@@ -1,0 +1,85 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/hyperpolymath/dictask/schemas/candidate-intent.json",
+  "title": "Candidate Intent",
+  "description": "Structured output from the Haskell NLP parser — a candidate task intent extracted from a transcript segment.",
+  "type": "object",
+  "required": ["id", "transcript_id", "parser_version", "intent_type", "raw_text", "confidence", "parsed_data"],
+  "properties": {
+    "id": {
+      "type": "string",
+      "format": "uuid",
+      "description": "UUID v7 for this candidate intent"
+    },
+    "transcript_id": {
+      "type": "string",
+      "format": "uuid",
+      "description": "Reference to the source transcript"
+    },
+    "parser_version": {
+      "type": "string",
+      "description": "Version of dictask-parse that produced this intent"
+    },
+    "intent_type": {
+      "type": "string",
+      "enum": ["add_task", "update_task", "delete_task", "set_deadline", "set_priority", "add_tag", "note"],
+      "description": "What the speaker intended"
+    },
+    "raw_text": {
+      "type": "string",
+      "description": "The original transcript segment this intent was extracted from"
+    },
+    "confidence": {
+      "type": "number",
+      "minimum": 0.0,
+      "maximum": 1.0,
+      "description": "Parser confidence score. >= 0.8 auto-apply, 0.3-0.8 review, < 0.3 log only"
+    },
+    "review_required": {
+      "type": "boolean",
+      "default": false,
+      "description": "Whether this intent requires human review before application"
+    },
+    "parsed_data": {
+      "type": "object",
+      "description": "Structured extraction from the raw text",
+      "properties": {
+        "title": { "type": "string" },
+        "description": { "type": ["string", "null"] },
+        "deadline": {
+          "type": ["string", "null"],
+          "format": "date",
+          "description": "ISO 8601 date, or null if no deadline mentioned"
+        },
+        "deadline_tentative": {
+          "type": "boolean",
+          "default": false,
+          "description": "True if deadline is vague (e.g. 'after Easter', 'next week sometime')"
+        },
+        "priority_keywords": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "Keywords indicating urgency/importance (e.g. 'urgent', 'important', 'asap')"
+        },
+        "tags": {
+          "type": "array",
+          "items": { "type": "string" }
+        },
+        "project": { "type": ["string", "null"] },
+        "target_task_id": {
+          "type": ["string", "null"],
+          "format": "uuid",
+          "description": "For update/delete intents: which existing task this refers to"
+        }
+      }
+    },
+    "ambiguity_notes": {
+      "type": ["string", "null"],
+      "description": "Parser notes about why confidence is low or what was ambiguous"
+    },
+    "parsed_at": {
+      "type": "string",
+      "format": "date-time"
+    }
+  }
+}
