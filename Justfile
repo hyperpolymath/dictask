@@ -8,6 +8,9 @@ set shell := ["bash", "-uc"]
 set dotenv-load := true
 set positional-arguments := true
 
+# Import auto-generated contractile recipes
+import? "contractile.just"
+
 project := "dictask"
 version := "0.1.0"
 tier := "2"
