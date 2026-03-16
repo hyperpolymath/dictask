@@ -6,6 +6,7 @@
 //! Pipeline stage 4: Convert audio files to text transcripts.
 //! Produces structured JSON with word-level timing and confidence.
 
+#![forbid(unsafe_code)]
 use serde::{Deserialize, Serialize};
 use uuid::Uuid;
 

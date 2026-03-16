@@ -7,6 +7,7 @@
 //! go through this module. Views (Markdown, JSON, CSV) are generated from
 //! the canonical store.
 
+#![forbid(unsafe_code)]
 use anyhow::Result;
 use rusqlite::Connection;
 use std::path::Path;

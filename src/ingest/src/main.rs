@@ -8,6 +8,7 @@
 //! 2. Archive raw audio files with SHA-256 checksums
 //! 3. Upload encrypted backup to cloud (retry 3x / quarantine)
 
+#![forbid(unsafe_code)]
 use anyhow::Result;
 use sha2::{Digest, Sha256};
 use std::env;
