@@ -1,0 +1,26 @@
+# SPDX-License-Identifier: PMPL-1.0-or-later
+# Clade declaration — part of the gv-clade-index registry
+# See: https://github.com/hyperpolymath/gv-clade-index
+
+[identity]
+uuid = "6bfce34f-f90d-56e2-ba72-a81d6fd6199e"
+primary-forge = "github"
+primary-owner = "hyperpolymath"
+canonical-name = "dictask"
+prefixed-name = "ap-dictask"
+
+[clade]
+primary = "ap"
+secondary = []
+assigned = "2026-03-16"
+rationale = ""
+
+[forges]
+github = "hyperpolymath/dictask"
+gitlab = "hyperpolymath/dictask"
+bitbucket = "hyperpolymath/dictask"
+
+[lineage]
+type = "standalone"
+parent = "Dictionary-based task management"
+born = "2026-03-16"
