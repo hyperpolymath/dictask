@@ -6,7 +6,7 @@
 [source,bibtex]
 ----
 @software{Dictask_2026,
-  author = {{{AUTHOR_LAST}}, {{AUTHOR_FIRST}}},
+  author = {Jewell, Jonathan},
   title = {Dictask},
   year = {2026},
   url = {https://github.com/hyperpolymath/Dictask},
@@ -16,7 +16,7 @@
 
 == Harvard Style
 
-{{AUTHOR_LAST}}, {{AUTHOR_INITIALS}} (2026) _Dictask_ [Computer software]. Available at: https://github.com/hyperpolymath/Dictask
+Jewell, J.D.A. (2026) _Dictask_ [Computer software]. Available at: https://github.com/hyperpolymath/Dictask
 
 == OSCOLA
 
@@ -24,11 +24,11 @@ Jonathan D.A. Jewell, 'Dictask' (2026) <https://github.com/hyperpolymath/Dictask
 
 == MLA
 
-{{AUTHOR_LAST}}, {{AUTHOR_FIRST}} "Dictask." 2026, github.com/hyperpolymath/Dictask.
+Jewell, Jonathan "Dictask." 2026, github.com/hyperpolymath/Dictask.
 
 == APA 7
 
-{{AUTHOR_LAST}}, {{AUTHOR_INITIALS}} (2026). _Dictask_ [Computer software]. GitHub. https://github.com/hyperpolymath/Dictask
+Jewell, J.D.A. (2026). _Dictask_ [Computer software]. GitHub. https://github.com/hyperpolymath/Dictask
 
 == See Also
 
