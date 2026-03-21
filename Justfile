@@ -188,3 +188,7 @@ clean:
     cd src/store && cargo clean
     cd src/parse && cabal clean
     cd src/interface/ffi && rm -rf zig-out zig-cache
+
+# Run panic-attacker pre-commit scan
+assail:
+    @command -v panic-attack >/dev/null 2>&1 && panic-attack assail . || echo "panic-attack not found — install from https://github.com/hyperpolymath/panic-attacker"
