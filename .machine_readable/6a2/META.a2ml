@@ -1,4 +1,4 @@
-# SPDX-License-Identifier: PMPL-1.0-or-later
+# SPDX-License-Identifier: MPL-2.0
 # Copyright (c) 2026 Jonathan D.A. Jewell (hyperpolymath) <j.d.a.jewell@open.ac.uk>
 #
 # META.a2ml — Architecture decisions, design rationale, governance for dictask
@@ -10,7 +10,7 @@ last-updated = "2026-03-13"
 [project-info]
 type = "service"  # library | binary | monorepo | service | website
 languages = ["rust", "haskell", "idris2", "zig", "bash"]
-license = "PMPL-1.0-or-later"
+license = "MPL-2.0"
 author = "Jonathan D.A. Jewell (hyperpolymath)"
 
 [architecture-decisions]

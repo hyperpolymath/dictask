@@ -1,4 +1,4 @@
--- SPDX-License-Identifier: PMPL-1.0-or-later
+-- SPDX-License-Identifier: MPL-2.0
 cabal-version:      3.0
 name:               dictask-parse
 version:            0.1.0.0
@@ -7,7 +7,7 @@ description:
   Haskell parser using megaparsec to extract structured task intents
   from speech transcripts. Produces candidate intents with confidence
   scores for the dictask pipeline.
-license:            LicenseRef-PMPL-1.0-or-later
+license:            LicenseRef-MPL-2.0
 license-file:       ../../LICENSE
 author:             Jonathan D.A. Jewell
 maintainer:         j.d.a.jewell@open.ac.uk
