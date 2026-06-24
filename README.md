@@ -1,6 +1,6 @@
 [![Sponsor](https://img.shields.io/badge/Sponsor-%E2%9D%A4-pink?logo=github)](https://github.com/sponsors/hyperpolymath)
 
-// SPDX-License-Identifier: MPL-2.0
+// SPDX-License-Identifier: CC-BY-SA-4.0
 = dictask — Speech-to-Do Pipeline
 Jonathan D.A. Jewell <j.d.a.jewell@open.ac.uk>
 :toc: preamble
@@ -290,5 +290,5 @@ Provisions: encrypted storage bucket, IAM roles, lifecycle rules.
 
 == License
 
-SPDX-License-Identifier: MPL-2.0 +
+SPDX-License-Identifier: CC-BY-SA-4.0 +
 See link:LICENSE[LICENSE] and link:docs/legal/[docs/legal/] for details.
