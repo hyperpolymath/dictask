@@ -1,10 +1,10 @@
-# SPDX-License-Identifier: CC-BY-SA-4.0
+== SPDX-License-Identifier: CC-BY-SA-4.0
 
-# dictask — Architecture Topology
+== dictask — Architecture Topology
 
-## System Architecture
+=== System Architecture
 
-```
+....
                          ┌─────────────────┐
                          │  Portable Voice  │
                          │    Recorder      │
@@ -77,11 +77,11 @@
                                    │ [10] Notify          │
                                    │ Dashboard / Email    │
                                    └─────────────────────┘
-```
+....
 
-## Interface Architecture (Verified Seams)
+=== Interface Architecture (Verified Seams)
 
-```
+....
 ┌──────────────────────────────┐
 │ Idris2 ABI (src/interface/abi/)│  ← The Specification (dependent types)
 │ • Task type with proofs       │
@@ -102,38 +102,42 @@
 │ (ingest, transcribe, store,   │
 │  review)                      │
 └──────────────────────────────┘
-```
+....
 
-## Completion Dashboard
+=== Completion Dashboard
 
-| Component              | Progress                       | Status |
-|------------------------|--------------------------------|--------|
-| Architecture design    | `████████░░` 80%               | Active |
-| SQLite schema          | `░░░░░░░░░░` 0%                | —      |
-| Idris2 ABI proofs      | `░░░░░░░░░░` 0%                | —      |
-| Zig FFI bridge         | `░░░░░░░░░░` 0%                | —      |
-| Rust ingest            | `░░░░░░░░░░` 0%                | —      |
-| Rust transcription     | `░░░░░░░░░░` 0%                | —      |
-| Haskell parser         | `░░░░░░░░░░` 0%                | —      |
-| Confidence scoring     | `░░░░░░░░░░` 0%                | —      |
-| Deduplication          | `░░░░░░░░░░` 0%                | —      |
-| Review queue           | `░░░░░░░░░░` 0%                | —      |
-| View generation        | `░░░░░░░░░░` 0%                | —      |
-| Ansible deployment     | `░░░░░░░░░░` 0%                | —      |
-| Terraform provisioning | `░░░░░░░░░░` 0%                | —      |
-| Audit trail            | `░░░░░░░░░░` 0%                | —      |
-| CI/CD (Hypatia)        | `░░░░░░░░░░` 0%                | —      |
-| **Overall**            | `█░░░░░░░░░` ~5%               | Design |
+[cols=",,",options="header",]
+|===
+|Component |Progress |Status
+|Architecture design |`+████████░░+` 80% |Active
+|SQLite schema |`+░░░░░░░░░░+` 0% |—
+|Idris2 ABI proofs |`+░░░░░░░░░░+` 0% |—
+|Zig FFI bridge |`+░░░░░░░░░░+` 0% |—
+|Rust ingest |`+░░░░░░░░░░+` 0% |—
+|Rust transcription |`+░░░░░░░░░░+` 0% |—
+|Haskell parser |`+░░░░░░░░░░+` 0% |—
+|Confidence scoring |`+░░░░░░░░░░+` 0% |—
+|Deduplication |`+░░░░░░░░░░+` 0% |—
+|Review queue |`+░░░░░░░░░░+` 0% |—
+|View generation |`+░░░░░░░░░░+` 0% |—
+|Ansible deployment |`+░░░░░░░░░░+` 0% |—
+|Terraform provisioning |`+░░░░░░░░░░+` 0% |—
+|Audit trail |`+░░░░░░░░░░+` 0% |—
+|CI/CD (Hypatia) |`+░░░░░░░░░░+` 0% |—
+|*Overall* |`+█░░░░░░░░░+` ~5% |Design
+|===
 
-## Key Dependencies
+=== Key Dependencies
 
-| Dependency   | Version | Purpose                    |
-|-------------|---------|----------------------------|
-| whisper-rs   | latest  | Offline ASR (Whisper model) |
-| vosk         | latest  | Alternative offline ASR    |
-| megaparsec   | 9.x     | Haskell parser combinators |
-| rusqlite     | latest  | SQLite bindings for Rust   |
-| idris2       | 0.7+    | ABI formal verification    |
-| zig          | 0.13+   | FFI bridge                 |
-| ansible      | 2.x     | Local deployment           |
-| terraform    | 1.x     | Cloud provisioning         |
+[cols=",,",options="header",]
+|===
+|Dependency |Version |Purpose
+|whisper-rs |latest |Offline ASR (Whisper model)
+|vosk |latest |Alternative offline ASR
+|megaparsec |9.x |Haskell parser combinators
+|rusqlite |latest |SQLite bindings for Rust
+|idris2 |0.7+ |ABI formal verification
+|zig |0.13+ |FFI bridge
+|ansible |2.x |Local deployment
+|terraform |1.x |Cloud provisioning
+|===
