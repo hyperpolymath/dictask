@@ -1,52 +1,71 @@
-// SPDX-License-Identifier: CC-BY-SA-4.0
-= Contributing to dictask
-:toc: preamble
-:icons: font
+== Contributing
 
-This document explains how to contribute to dictask. We follow a "Dual-Track"
+Thank you for your interest in contributing! We follow a "`Dual-Track`"
 architecture where human-readable documentation lives in the root and
-machine-readable policies live in `.machine_readable/`.
+machine-readable policies live in `+.machine_readable/+`.
 
-== How to Contribute
+=== How to Contribute
 
 We welcome contributions in many forms:
 
-* **Rust code:** Improving ingest, transcription, store, or review components.
-* **Haskell parser:** Enhancing NLP task extraction patterns.
-* **Idris2 proofs:** Strengthening formal verification of task schema.
-* **Documentation:** Improving AsciiDoc manuals or AI manifests.
-* **Testing:** Adding property-based tests or integration tests.
+* *Code:* Improving the core stack or extensions
+* *Documentation:* Enhancing docs or AI manifests
+* *Testing:* Adding property-based tests or formal proofs
+* *Bug reports:* Filing clear, reproducible issues
 
-== Getting Started
+=== Getting Started
 
-1. **Read the AI Manifest:** Start with `0-AI-MANIFEST.a2ml` to understand the
-   repository structure.
-2. **Environment:** Use `nix develop` or `direnv allow` to set up tools
-   (Rust, Haskell/GHC, Idris2, Zig).
-3. **Task Runner:** Use `just` to see available commands (`just --list`).
+[arabic]
+. *Read the AI Manifest:* Start with `+0-AI-MANIFEST.a2ml+` (if present)
+to understand the repository structure.
+. *Environment:* Use `+guix develop+` or `+direnv allow+` to set up your
+tools.
+. *Task Runner:* Use `+just+` to see available commands
+(`+just --list+`).
 
-== Language Policy
+=== Development Workflow
 
-[cols="1,2"]
-|===
-| Allowed | Use Case
+==== Branch Naming
 
-| Rust | Ingest, transcription, store, review, CLI
-| Haskell | NLP parsing (megaparsec)
-| Idris2 | ABI definitions, formal proofs
-| Zig | FFI bridge
-| Bash | Scripts, automation
-|===
+....
+docs/short-description       # Documentation
+test/what-added              # Test additions
+feat/short-description       # New features
+fix/issue-number-description # Bug fixes
+refactor/what-changed        # Code improvements
+security/what-fixed          # Security fixes
+....
 
-**Not allowed:** Python, TypeScript, Node.js, Go, Java.
+==== Commit Messages
 
-== Contribution Policies
+We follow https://www.conventionalcommits.org/[Conventional Commits]:
 
-For detailed rules on branch naming, commit messages, and the PR process,
-please refer to the machine-readable manual at
-link:.github/CONTRIBUTING.md[CONTRIBUTING.md].
+....
+<type>(<scope>): <description>
 
-== Code of Conduct
+[optional body]
 
-All contributors are expected to adhere to our ethical standards.
-See link:.github/CODE_OF_CONDUCT.md[CODE_OF_CONDUCT.md] for details.
+[optional footer]
+....
+
+Types: `+feat+`, `+fix+`, `+docs+`, `+test+`, `+refactor+`, `+ci+`,
+`+chore+`, `+security+`
+
+=== Reporting Bugs
+
+Before reporting: 1. Search existing issues 2. Check if it’s already
+fixed in `+main+`
+
+When reporting, include: - Clear, descriptive title - Environment
+details (OS, versions, toolchain) - Steps to reproduce - Expected vs
+actual behaviour
+
+=== Code of Conduct
+
+All contributors are expected to adhere to our
+link:CODE_OF_CONDUCT.md[Code of Conduct].
+
+=== License
+
+By contributing, you agree that your contributions will be licensed
+under the same license as the project (see LICENSE).
