@@ -1,12 +1,16 @@
-<!-- SPDX-License-Identifier: CC-BY-SA-4.0 -->
+<!--
+SPDX-License-Identifier: CC-BY-SA-4.0
+Copyright (c) Jonathan D.A. Jewell <j.d.a.jewell@open.ac.uk>
+-->
 <!-- Copyright (c) 2026 Jonathan D.A. Jewell (hyperpolymath) <j.d.a.jewell@open.ac.uk> -->
-<!-- Authoritative source: docs/AI-CONVENTIONS.md -->
+<!-- Authoritative source: docs/practice/AI-CONVENTIONS.adoc -->
 
 # Copilot Instructions
 
 ## Before Writing Code
 
-- Read `0-AI-MANIFEST.a2ml` in the repo root for canonical file locations.
+- Read the repo deed (`*_chora.deed` in the repo root) for canonical file locations
+  (its `(ply ...)` clauses carry the canonical-locations tables).
 - State files (.a2ml) live in `.machine_readable/` ONLY, never the root.
 
 ## License
@@ -31,12 +35,37 @@
 - Lean: no `sorry`
 - Rust: no `transmute` unless FFI with `// SAFETY:` comment
 
+## JavaScript / TypeScript runtimes
+
+Ordered preference (`standards/3-practice/LANGUAGE-POLICY.adoc` §1) — reach for the first
+that can do the job:
+
+1. **Bun** — default for all new work. Runs compiled ESM/JS directly, no bundler
+   step. Uses an npm-compatible `package.json` plus `bun.lock`; both are
+   expected, not anti-patterns.
+2. **pnpm** — only where an upstream toolchain requires `node_modules`.
+3. **npm** — last resort. Permitted, never preferred; a deliberate, noted choice.
+
+**Deno is being removed**, not grandfathered. Owner ruling 2026-08-26: *"deno is
+to go and bun is the way we are going, put it first everywhere unless not
+possible and explain why if not."* Existing Deno projects migrate to Bun; where
+Bun genuinely cannot be used, document the reason in the repo.
+
+**TypeScript is not the language for new application code — AffineScript is.**
+`LANGUAGE-POLICY.adoc` §1.2, ruled 2026-08-25, separates two questions the older
+text ran together: *runtime* is Bun (where `.ts` runs at all, Bun runs it), while
+the *language* target is AffineScript. TypeScript is permitted only where
+AffineScript cannot reach — the same narrow, transitional carve-out JavaScript
+holds for MCP protocol glue and runtime APIs. ReScript remains banned; its
+migration destination is AffineScript.
+
 ## Banned Languages
 
-- No TypeScript (use AffineScript)
-- No Node.js / npm / bun (use Deno)
 - No Go (use Rust)
 - No Python (use Julia or Rust)
+- No Nix (use Guix)
+- No Deno for new work — being removed estate-wide; use Bun (owner ruling 2026-08-26)
+- No ReScript (`LANGUAGE-POLICY.adoc` §3) — migrate to AffineScript
 
 ## Containers
 

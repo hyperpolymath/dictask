@@ -1,0 +1,61 @@
+# SPDX-License-Identifier: MPL-2.0
+# Copyright (c) 2026 Jonathan D.A. Jewell (hyperpolymath) <j.d.a.jewell@open.ac.uk>
+#
+# ECOSYSTEM.a2ml — Project ecosystem position for dicta-task
+
+[metadata]
+version = "0.1.0"
+last-updated = "2026-09-26"
+
+[project]
+name = "dicta-task"
+previous-names = ["dictask"]
+type = "service"
+purpose = "Speech-to-do pipeline: portable recorder → transcription → NLP parsing → prioritised task list"
+role = "service"  # ffi-infrastructure, cli-tool, library, service
+
+[position-in-ecosystem]
+tier = "2"  # 1 | 2 | infrastructure
+position = "leaf"
+chain = "standards → rsr-template-repo → dicta-task"
+coordination = "standards"
+what-this-is-not = [
+  "a cloud dictation service (ASR runs offline; cloud is encrypted backup only)",
+  "a general note-taking app",
+  "a template (it is minted from rsr-template-repo)",
+]
+
+[related-projects]
+projects = [
+  { name = "rsr-template-repo", relationship = "template-parent", notes = "Scaffolding this repo is minted from; see VARIANT.a2ml parent-pin." },
+  { name = "ambientops", relationship = "sibling-standard", notes = "Personal sysadmin/automation — dicta-task is an ambientops workflow" },
+  { name = "proven", relationship = "dependency", notes = "Formally verified safety modules for audio processing and crypto" },
+  { name = "verisimdb", relationship = "potential-consumer", notes = "Secondary replica / federation of the task store (src/interface/ffi/src/verisimdb.zig)" },
+  { name = "panll", relationship = "potential-consumer", notes = "Review queue could surface as a PanLL panel" },
+  { name = "hypatia", relationship = "dependency", notes = "CI/CD scanning for the pipeline" },
+  { name = "gitbot-fleet", relationship = "dependency", notes = "Bot orchestration for automated pipeline steps" },
+  { name = "stapeln", relationship = "dependency", notes = "Container ecosystem for deployment" },
+]
+
+[integration-points]
+integrations = [
+  { system = "udev/systemd", direction = "inbound", protocol = "device-event", notes = "Detects portable recorder USB insertion" },
+  { system = "cloud-storage", direction = "outbound", protocol = "s3-compatible", notes = "Encrypted backup of raw audio" },
+  { system = "whisper/vosk", direction = "internal", protocol = "library-call", notes = "Offline ASR transcription" },
+  { system = "sqlite", direction = "internal", protocol = "sql", notes = "Canonical task store (see docs/decisions/0004-storage-backend.adoc)" },
+  { system = "gitbot-fleet", direction = "outbound", protocol = "repository_dispatch", notes = "Notifications for review items" },
+]
+
+[data-flow]
+pipeline = [
+  "Recorder USB → udev/systemd trigger",
+  "Raw audio → local archive (SHA-256 checksummed)",
+  "Archive → encrypted cloud backup (retry 3x / quarantine)",
+  "Audio → Whisper/Vosk transcription → transcript JSON",
+  "Transcript → Haskell megaparsec NLP → candidate intents (JSON with confidence)",
+  "Candidates → normalise/validate → resolve dates, assign priority",
+  "Normalised → deduplication (exact + semantic) → merge/link",
+  "Deduplicated → review queue (low confidence) or auto-apply (high confidence)",
+  "Canonical store (SQLite) → derived views (Markdown, JSON, CSV)",
+  "Review items → notification (dashboard/email)",
+]

@@ -1,5 +1,7 @@
 # SPDX-License-Identifier: MPL-2.0
-# Proven Integration — Formally Verified Safety Library
+# OPTIONAL: Proven Integration — Formally Verified Safety Library
+# Delete this file if your project does not use the proven library.
+# See https://github.com/hyperpolymath/proven for details.
 
 [integration]
 name = "proven"

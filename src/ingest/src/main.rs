@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: MPL-2.0
 // Copyright (c) 2026 Jonathan D.A. Jewell (hyperpolymath) <j.d.a.jewell@open.ac.uk>
 //
-//! dictask ingest: detect recorder, archive audio files, compute checksums.
+//! dicta-task ingest: detect recorder, archive audio files, compute checksums.
 //!
 //! Pipeline stages 1-3:
 //! 1. Detect recorder USB insertion (triggered by udev/systemd)
@@ -91,10 +91,10 @@ fn archive_file(source: &Path, archive_dir: &Path) -> Result<IngestedFile> {
 async fn main() -> Result<()> {
     tracing_subscriber::init();
 
-    let data_dir = env::var("DICTASK_DATA_DIR")
+    let data_dir = env::var("DICTA_TASK_DATA_DIR")
         .unwrap_or_else(|_| {
             let home = env::var("HOME").expect("HOME not set");
-            format!("{}/.local/share/dictask", home)
+            format!("{}/.local/share/dicta-task", home)
         });
     let archive_dir = PathBuf::from(&data_dir).join("audio-archive");
 
@@ -106,7 +106,7 @@ async fn main() -> Result<()> {
         .nth(1)
         .map(PathBuf::from)
         .unwrap_or_else(|| {
-            warn!("No mount point provided; use: dictask-ingest /path/to/recorder");
+            warn!("No mount point provided; use: dicta-task-ingest /path/to/recorder");
             PathBuf::from("/media/recorder")
         });
 

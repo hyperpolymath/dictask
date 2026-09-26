@@ -1,4 +1,5 @@
 // SPDX-License-Identifier: CC-BY-SA-4.0
+// Copyright (c) Jonathan D.A. Jewell <j.d.a.jewell@open.ac.uk>
 = Dev Container Usage
 :author: Jonathan D.A. Jewell <j.d.a.jewell@open.ac.uk>
 
@@ -24,4 +25,4 @@ This dev container uses `cgr.dev/chainguard/wolfi-base` with git, curl, bash, an
 
 == Customization
 
-Replace `Dictask` placeholders in both `devcontainer.json` and `Containerfile` with your actual project name. Run `just deps` to verify the environment after first launch.
+Replace `Dicta-Task` placeholders in both `devcontainer.json` and `Containerfile` with your actual project name. Run `just deps` to verify the environment after first launch.

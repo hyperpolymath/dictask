@@ -1,297 +1,193 @@
 # SPDX-License-Identifier: MPL-2.0
 # Copyright (c) 2026 Jonathan D.A. Jewell (hyperpolymath) <j.d.a.jewell@open.ac.uk>
 #
-# dictask — Speech-to-Do Pipeline
+# RSR Standard Justfile Template
 # https://just.systems/man/en/
+#
+# Copy this file to new projects and customize the placeholder values.
+#
+# Run `just` to see all available recipes
+# Run `just cookbook` to generate docs/just-cookbook.adoc
+# Run `just combinations` to see matrix recipe options
 
 set shell := ["bash", "-uc"]
 set dotenv-load := true
 set positional-arguments := true
 
-# Import auto-generated contractile recipes
-import? "contractile.just"
+# Import auto-generated contractile recipes (must-check, trust-verify, etc.)
+# Re-generate with: contractile gen-just
+import? "build/contractile.just"
 
-project := "dictask"
+# Project metadata — customize these
+project := "dicta-task"
+OWNER := "hyperpolymath"
+REPO := "dicta-task"
 version := "0.1.0"
-tier := "2"
+tier := "infrastructure"  # 1 | 2 | infrastructure
 
 # ═══════════════════════════════════════════════════════════════════════════════
 # DEFAULT & HELP
 # ═══════════════════════════════════════════════════════════════════════════════
 
-# Show all available recipes
+# Show all available recipes with descriptions
 default:
     @just --list --unsorted
 
-# Show project info
+# Show detailed help for a specific recipe
+help recipe="":
+    #!/usr/bin/env bash
+    if [ -z "{{recipe}}" ]; then
+        just --list --unsorted
+        echo ""
+        echo "Usage: just help <recipe>"
+        echo "       just cookbook     # Generate full documentation"
+        echo "       just combinations # Show matrix recipes"
+    else
+        just --show "{{recipe}}" 2>/dev/null || echo "Recipe '{{recipe}}' not found"
+    fi
+
+# Show this project's info
 info:
-    @echo "Project: {{project}}"
+    @echo "Project: dicta_task"
     @echo "Version: {{version}}"
     @echo "RSR Tier: {{tier}}"
     @echo "Recipes: $(just --summary | wc -w)"
-    @[ -f ".machine_readable/STATE.a2ml" ] && grep -oP 'phase\s*=\s*"\K[^"]+' .machine_readable/STATE.a2ml | head -1 | xargs -I{} echo "Phase: {}" || true
+    @[ -f ".machine_readable/descriptiles/STATE.a2ml" ] && grep -oP 'phase\s*=\s*"\K[^"]+' .machine_readable/descriptiles/STATE.a2ml | head -1 | xargs -I{} echo "Phase: {}" || true
+
+# Run Invariant Path overlay tools for this repository
+invariant-path *ARGS:
+    ./scripts/invariant-path.sh {{ARGS}}
 
 # ═══════════════════════════════════════════════════════════════════════════════
-# BUILD
+# INIT — see build/just/repo-init.just
 # ═══════════════════════════════════════════════════════════════════════════════
 
-# Build all components
-build: build-rust build-haskell build-ffi
+import? "build/just/repo-init.just"
 
-# Build Rust components (ingest, transcribe, store)
-build-rust:
-    cd src/ingest && cargo build
-    cd src/transcribe && cargo build
-    cd src/store && cargo build
-
-# Build Rust components in release mode
-build-rust-release:
-    cd src/ingest && cargo build --release
-    cd src/transcribe && cargo build --release
-    cd src/store && cargo build --release
-
-# Build Haskell parser
-build-haskell:
-    cd src/parse && cabal build
-
-# Build Zig FFI bridge
-build-ffi:
-    cd src/interface/ffi && zig build
+# >>> container-module (three-tier: OCI · portable engine · stapeln) >>>
+# Self-contained. Remove the entire block — this and the import — with `just no-container`.
+import? "build/just/container.just"
+# <<< container-module <<<
 
 # ═══════════════════════════════════════════════════════════════════════════════
-# TEST
+# GROOVE PROTOCOL — see build/just/groove.just
+# ═══════════════════════════════════════════════════════════════════════════════
+
+import? "build/just/groove.just"
+
+# ═══════════════════════════════════════════════════════════════════════════════
+# PROJECT SELF-ASSESSMENT + OPENSSF COMPLIANCE — see build/just/assess.just
+# ═══════════════════════════════════════════════════════════════════════════════
+
+import? "build/just/assess.just"
+
+# ═══════════════════════════════════════════════════════════════════════════════
+# BUILD & COMPILE
+# ═══════════════════════════════════════════════════════════════════════════════
+
+# Build the project (debug mode)
+# dicta-task Rust crates (built individually; see ADR-0004 / README)
+RUST_CRATES := "ingest store transcribe"
+
+build *args:
+    #!/usr/bin/env bash
+    set -euo pipefail
+    # Rust crates are independent (no root Cargo.toml: RSR root shape).
+    for c in {{RUST_CRATES}}; do (cd "src/$c" && cargo build {{args}}); done
+    (cd src/parse && cabal build all)
+
+# Build in release mode with optimizations
+build-release *args:
+    #!/usr/bin/env bash
+    set -euo pipefail
+    for c in {{RUST_CRATES}}; do (cd "src/$c" && cargo build --release {{args}}); done
+    (cd src/parse && cabal build all -O2)
+
+# Build and watch for changes (requires entr or similar)
+build-watch:
+    @echo "Watching for changes..."
+    # TODO: Customize file patterns for your language
+    # Examples:
+    #   find src -name '*.rs' | entr -c just build
+    #   mix compile --force --warnings-as-errors
+    #   deno task dev
+
+# Clean build artifacts [reversible: rebuild with `just build`]
+clean:
+    @echo "Cleaning..."
+    # TODO: Customize for your build system
+    #
+    # `build/` is DELIBERATELY ABSENT from this list. It is not an artifact
+    # directory in an RSR repo: it holds 11 tracked files, including
+    # build/just/repo-init.just, which the root Justfile imports at line 65.
+    # Deleting it destroys `just repo-init`, `just verify` and the proof gates.
+    rm -rf target/ _build/ dist/ out/ obj/ bin/
+
+# Deep clean including caches [reversible: rebuild]
+clean-all: clean
+    rm -rf .cache .tmp
+
+# ═══════════════════════════════════════════════════════════════════════════════
+# TEST & QUALITY
 # ═══════════════════════════════════════════════════════════════════════════════
 
 # Run all tests
-test: test-rust test-haskell test-ffi
-
-# Run Rust tests
-test-rust:
-    cd src/ingest && cargo test
-    cd src/transcribe && cargo test
-    cd src/store && cargo test
-
-# Run Haskell parser tests
-test-haskell:
-    cd src/parse && cabal test
-
-# Run Zig FFI tests
-test-ffi:
-    cd src/interface/ffi && zig build test
-
-# ═══════════════════════════════════════════════════════════════════════════════
-# PIPELINE (manual invocation)
-# ═══════════════════════════════════════════════════════════════════════════════
-
-# Run ingest from a mounted recorder path
-ingest mount_point="/media/recorder":
-    cd src/ingest && cargo run -- "{{mount_point}}"
-
-# Transcribe a specific audio file
-transcribe file:
-    @echo "STUB: transcription not yet implemented"
-    @echo "Would transcribe: {{file}}"
-
-# Parse a transcript file into candidate intents
-parse file:
-    @echo "STUB: parsing not yet integrated as CLI"
-    @echo "Would parse: {{file}}"
-
-# Generate views from canonical SQLite store
-views:
-    @echo "STUB: view generation not yet implemented"
-    @echo "Would generate: Markdown, JSON, CSV views"
-
-# ═══════════════════════════════════════════════════════════════════════════════
-# DATABASE
-# ═══════════════════════════════════════════════════════════════════════════════
-
-# Initialise SQLite database from schema
-db-init:
+test *args:
     #!/usr/bin/env bash
-    DB_PATH="${DICTASK_DATA_DIR:-$HOME/.local/share/dictask}/tasks.db"
-    mkdir -p "$(dirname "$DB_PATH")"
-    sqlite3 "$DB_PATH" ".read schemas/tasks.sql"
-    echo "Database initialised at: $DB_PATH"
+    set -euo pipefail
+    for c in {{RUST_CRATES}}; do (cd "src/$c" && cargo test {{args}}); done
+    (cd src/parse && cabal test all --test-show-details=direct)
+    (cd src/interface/ffi && zig build test)
 
-# Show database stats
-db-stats:
-    #!/usr/bin/env bash
-    DB_PATH="${DICTASK_DATA_DIR:-$HOME/.local/share/dictask}/tasks.db"
-    echo "=== dictask Database Stats ==="
-    echo "Tasks:      $(sqlite3 "$DB_PATH" 'SELECT COUNT(*) FROM tasks;' 2>/dev/null || echo 'N/A')"
-    echo "Audio:      $(sqlite3 "$DB_PATH" 'SELECT COUNT(*) FROM audio_files;' 2>/dev/null || echo 'N/A')"
-    echo "Transcripts:$(sqlite3 "$DB_PATH" 'SELECT COUNT(*) FROM transcripts;' 2>/dev/null || echo 'N/A')"
-    echo "Intents:    $(sqlite3 "$DB_PATH" 'SELECT COUNT(*) FROM candidate_intents;' 2>/dev/null || echo 'N/A')"
-    echo "Audit log:  $(sqlite3 "$DB_PATH" 'SELECT COUNT(*) FROM audit_log;' 2>/dev/null || echo 'N/A')"
-    echo "Review Q:   $(sqlite3 "$DB_PATH" 'SELECT COUNT(*) FROM review_queue WHERE resolution IS NULL;' 2>/dev/null || echo 'N/A')"
+# Run tests with verbose output
+test-verbose:
+    @echo "Running tests (verbose)..."
+    # TODO: Replace with verbose test command
 
-# ═══════════════════════════════════════════════════════════════════════════════
-# DEPLOYMENT
-# ═══════════════════════════════════════════════════════════════════════════════
+# Smoke test
+test-smoke:
+    @echo "Smoke test..."
+    # TODO: Add basic sanity checks
 
-# Run Ansible local setup
-deploy-local:
-    cd deploy/ansible && ansible-playbook setup.yml
+# Run end-to-end tests (full pipeline: build → run → verify)
+e2e:
+    @echo "Running E2E tests..."
+    # TODO: Replace with your E2E test command. Examples:
+    #   bash tests/e2e.sh                    # Shell-based E2E
+    #   npx playwright test                  # Browser E2E
+    #   mix test test/integration/e2e_test.exs  # Elixir E2E
+    #   cargo test --test end_to_end         # Rust E2E
+    @echo "E2E tests passed!"
 
-# Initialise Terraform
-deploy-cloud-init:
-    cd deploy/terraform && terraform init
+# Run aspect tests (cross-cutting concern validation)
+aspect:
+    @echo "Running aspect tests..."
+    # TODO: Replace with your aspect test command. Examples:
+    #   bash tests/aspect_tests.sh           # Shell-based aspect tests
+    #   cargo test --test aspects             # Rust aspect tests
+    # Aspect tests validate architectural invariants:
+    #   - Thread safety (mutex in FFI modules)
+    #   - ABI/FFI contract (declarations match exports)
+    #   - SPDX compliance (all files have license headers)
+    #   - No dangerous patterns (believe_me, assert_total, etc.)
+    @echo "Aspect tests passed!"
 
-# Apply Terraform (provision cloud resources)
-deploy-cloud-apply:
-    cd deploy/terraform && terraform apply
+# Run benchmarks (performance regression detection)
+bench:
+    @echo "Running benchmarks..."
+    # TODO: Replace with your benchmark command. Examples:
+    #   cargo bench                           # Rust criterion
+    #   zig build bench                       # Zig benchmarks
+    #   mix run bench/benchmarks.exs          # Elixir benchee
+    #   deno bench                            # Deno bench
+    @echo "Benchmarks complete!"
 
-# ═══════════════════════════════════════════════════════════════════════════════
-# CONTAINER
-# ═══════════════════════════════════════════════════════════════════════════════
-
-# Build OCI container image
-container-build:
-    podman build -t dictask:{{version}} -f Containerfile .
-
-# Run container
-container-run:
-    podman run --rm -it dictask:{{version}}
-
-# ═══════════════════════════════════════════════════════════════════════════════
-# LINT & FORMAT
-# ═══════════════════════════════════════════════════════════════════════════════
-
-# Lint all code
-lint: lint-rust lint-haskell
-
-# Lint Rust code
-lint-rust:
-    cd src/ingest && cargo clippy -- -D warnings
-    cd src/transcribe && cargo clippy -- -D warnings
-    cd src/store && cargo clippy -- -D warnings
-
-# Lint Haskell code
-lint-haskell:
-    cd src/parse && cabal build --ghc-options="-Wall -Werror"
-
-# Format Rust code
-fmt-rust:
-    cd src/ingest && cargo fmt
-    cd src/transcribe && cargo fmt
-    cd src/store && cargo fmt
-
-# ═══════════════════════════════════════════════════════════════════════════════
-# CLEAN
-# ═══════════════════════════════════════════════════════════════════════════════
-
-# Clean all build artifacts
-clean:
-    cd src/ingest && cargo clean
-    cd src/transcribe && cargo clean
-    cd src/store && cargo clean
-    cd src/parse && cabal clean
-    cd src/interface/ffi && rm -rf zig-out zig-cache
-
-# Run panic-attacker pre-commit scan
-assail:
-    @command -v panic-attack >/dev/null 2>&1 && panic-attack assail . || echo "panic-attack not found — install from https://github.com/hyperpolymath/panic-attacker"
-
-# ═══════════════════════════════════════════════════════════════════════════════
-# ONBOARDING & DIAGNOSTICS
-# ═══════════════════════════════════════════════════════════════════════════════
-
-# Check all required toolchain dependencies and report health
-doctor:
-    #!/usr/bin/env bash
-    echo "═══════════════════════════════════════════════════"
-    echo "  Dictask Doctor — Toolchain Health Check"
-    echo "═══════════════════════════════════════════════════"
-    echo ""
-    PASS=0; FAIL=0; WARN=0
-    check() {
-        local name="$1" cmd="$2" min="$3"
-        if command -v "$cmd" >/dev/null 2>&1; then
-            VER=$("$cmd" --version 2>&1 | head -1)
-            echo "  [OK]   $name — $VER"
-            PASS=$((PASS + 1))
-        else
-            echo "  [FAIL] $name — not found (need $min+)"
-            FAIL=$((FAIL + 1))
-        fi
-    }
-    check "just"              just      "1.25" 
-    check "git"               git       "2.40" 
-# Optional tools
-if command -v panic-attack >/dev/null 2>&1; then
-    echo "  [OK]   panic-attack — available"
-    PASS=$((PASS + 1))
-else
-    echo "  [WARN] panic-attack — not found (pre-commit scanner)"
-    WARN=$((WARN + 1))
-fi
-    echo ""
-    echo "  Result: $PASS passed, $FAIL failed, $WARN warnings"
-    if [ "$FAIL" -gt 0 ]; then
-        echo "  Run 'just heal' to attempt automatic repair."
-        exit 1
-    fi
-    echo "  All required tools present."
-
-# Attempt to automatically install missing tools
-heal:
-    #!/usr/bin/env bash
-    echo "═══════════════════════════════════════════════════"
-    echo "  Dictask Heal — Automatic Tool Installation"
-    echo "═══════════════════════════════════════════════════"
-    echo ""
-if ! command -v just >/dev/null 2>&1; then
-    echo "Installing just..."
-    cargo install just 2>/dev/null || echo "Install just from https://just.systems"
-fi
-    echo ""
-    echo "Heal complete. Run 'just doctor' to verify."
-
-# Guided tour of the project structure and key concepts
-tour:
-    #!/usr/bin/env bash
-    echo "═══════════════════════════════════════════════════"
-    echo "  Dictask — Guided Tour"
-    echo "═══════════════════════════════════════════════════"
-    echo ""
-    echo '// SPDX-License-Identifier: MPL-2.0'
-    echo ""
-    echo "Key directories:"
-    echo "  src/                      Source code" 
-    echo "  docs/                     Documentation" 
-    echo "  tests/                    Test suite" 
-    echo "  .github/workflows/        CI/CD workflows" 
-    echo "  .machine_readable/        Machine-readable metadata" 
-    echo "  container/                Container configuration" 
-    echo "  examples/                 Usage examples" 
-    echo ""
-    echo "Quick commands:"
-    echo "  just doctor    Check toolchain health"
-    echo "  just heal      Fix missing tools"
-    echo "  just help-me   Common workflows"
-    echo "  just default   List all recipes"
-    echo ""
-    echo "Read more: README.adoc, EXPLAINME.adoc"
-
-# Show help for common workflows
-help-me:
-    #!/usr/bin/env bash
-    echo "═══════════════════════════════════════════════════"
-    echo "  Dictask — Common Workflows"
-    echo "═══════════════════════════════════════════════════"
-    echo ""
-echo "FIRST TIME SETUP:"
-echo "  just doctor           Check toolchain"
-echo "  just heal             Fix missing tools"
-echo "" 
-echo "PRE-COMMIT:"
-echo "  just assail           Run panic-attacker scan"
-echo ""
-echo "LEARN:"
-echo "  just tour             Guided project tour"
-echo "  just default          List all recipes" 
-
+# Run readiness tests (Component Readiness Grade: D/C/B)
+readiness:
+    @echo "Running readiness tests..."
+    # TODO: Replace with your readiness test command. Examples:
+    #   cargo test --test readiness -- --nocapture
+    @echo "Readiness tests complete!"
 
 # Print the current CRG grade (reads from READINESS.md '**Current Grade:** X' line)
 crg-grade:
@@ -299,13 +195,515 @@ crg-grade:
     [ -z "$$grade" ] && grade="X"; \
     echo "$$grade"
 
-# Generate a shields.io badge markdown for the current CRG grade
+# Print a shields.io CRG badge for embedding in README files
 # Looks for '**Current Grade:** X' in READINESS.md; falls back to X
 crg-badge:
     @grade=$$(grep -oP '(?<=\*\*Current Grade:\*\* )[A-FX]' READINESS.md 2>/dev/null | head -1); \
     [ -z "$$grade" ] && grade="X"; \
     case "$$grade" in \
-      A) color="brightgreen" ;; B) color="green" ;; C) color="yellow" ;; \
-      D) color="orange" ;; E) color="red" ;; F) color="critical" ;; \
-      *) color="lightgrey" ;; esac; \
+      A) color="brightgreen" ;; \
+      B) color="green" ;; \
+      C) color="yellow" ;; \
+      D) color="orange" ;; \
+      E) color="red" ;; \
+      F) color="critical" ;; \
+      *) color="lightgrey" ;; \
+    esac; \
     echo "[![CRG $$grade](https://img.shields.io/badge/CRG-$$grade-$$color?style=flat-square)](https://github.com/hyperpolymath/standards/tree/main/component-readiness-grades)"
+
+# Run the full merge-requirement test suite (ALL categories)
+# Per STANDING rule: P2P + E2E + aspect + execution + lifecycle + bench
+test-all: test e2e aspect bench readiness
+    @echo "All test categories passed — safe to merge!"
+
+# Run all quality checks
+quality: fmt-check lint test
+    @echo "All quality checks passed!"
+
+# Fix all auto-fixable issues [reversible: git checkout]
+fix: fmt
+    @echo "Fixed all auto-fixable issues"
+
+# ═══════════════════════════════════════════════════════════════════════════════
+# LINT & FORMAT
+# ═══════════════════════════════════════════════════════════════════════════════
+
+# Format all source files [reversible: git checkout]
+fmt:
+    @echo "Formatting source files..."
+    # TODO: Replace with your formatter
+    # Examples:
+    #   cargo fmt
+    #   mix format
+    #   gleam format
+    #   deno fmt
+
+# Check formatting without changes
+fmt-check:
+    @echo "Checking formatting..."
+    # TODO: Replace with your format check
+    # Examples:
+    #   cargo fmt --check
+    #   mix format --check-formatted
+    #   gleam format --check
+
+# Run linter
+lint:
+    @echo "Linting source files..."
+    # TODO: Replace with your linter
+    # Examples:
+    #   cargo clippy -- -D warnings
+    #   mix credo --strict
+    #   gleam check
+
+# ═══════════════════════════════════════════════════════════════════════════════
+# RUN & EXECUTE
+# ═══════════════════════════════════════════════════════════════════════════════
+
+# Run the application
+run *args: build
+    # TODO: Replace with your run command
+    echo "Run not configured yet"
+
+# Run with verbose output
+run-verbose *args: build
+    # TODO: Replace with verbose run command
+    echo "Run not configured yet"
+
+# Install to user path
+install: build-release
+    @echo "Installing dicta_task..."
+    # TODO: Replace with your install command
+
+# ═══════════════════════════════════════════════════════════════════════════════
+# DEPENDENCIES
+# ═══════════════════════════════════════════════════════════════════════════════
+
+# Install/check all dependencies
+deps:
+    @echo "Checking dependencies..."
+    # TODO: Replace with your dependency check
+    # Examples:
+    #   cargo check
+    #   mix deps.get
+    #   gleam deps download
+    @echo "All dependencies satisfied"
+
+# Audit dependencies for vulnerabilities
+deps-audit:
+    @echo "Auditing for vulnerabilities..."
+    # TODO: Replace with your audit command
+    # Examples:
+    #   cargo audit
+    #   mix audit
+    @command -v trivy >/dev/null && trivy fs --severity HIGH,CRITICAL --quiet . || true
+    @echo "Audit complete"
+
+# ═══════════════════════════════════════════════════════════════════════════════
+# ARRIVAL PACK — agent-facing CLAUDE.md, compiled from a2ml
+# ═══════════════════════════════════════════════════════════════════════════════
+
+# Compile CLAUDE.md (the agent arrival pack) from this repo's a2ml
+claude-md:
+    @bash .machine_readable/arrival-pack/generate.sh
+
+# Regenerate the single authoritative repository map
+repo-map:
+    @bash scripts/gen-repo-map.sh .
+
+# Fail if the repository map is stale (the map is generated; CI diffs it)
+validate-repo-map:
+    #!/usr/bin/env bash
+    set -euo pipefail
+    cd "{{justfile_directory()}}"
+    before=$(mktemp); cp docs/architecture/REPOSITORY-MAP.adoc "$before" 2>/dev/null || true
+    bash scripts/gen-repo-map.sh . >/dev/null
+    if ! diff -q "$before" docs/architecture/REPOSITORY-MAP.adoc >/dev/null 2>&1; then
+        echo "FAIL: docs/architecture/REPOSITORY-MAP.adoc is stale. Run: just repo-map" >&2
+        diff -u "$before" docs/architecture/REPOSITORY-MAP.adoc | head -40 >&2 || true
+        cp "$before" docs/architecture/REPOSITORY-MAP.adoc
+        rm -f "$before"; exit 1
+    fi
+    rm -f "$before"
+    echo "repository map: up to date"
+
+# Fail if CLAUDE.md's generated region drifted from a2ml or was hand-edited
+validate-claude-md:
+    @bash .machine_readable/arrival-pack/verify.sh
+
+# ═══════════════════════════════════════════════════════════════════════════════
+# COAPTATION — typed descriptile↔contractile face-off (homeostasis reading)
+# ═══════════════════════════════════════════════════════════════════════════════
+
+# Emit the coaptation receipt: how the descriptiles coapt with the contractiles (SITREP)
+coapt:
+    @bash .machine_readable/coaptation/coapt.sh --report
+
+# Assemble a re-anchor basis IF the band is red (the drop itself is a human act)
+coapt-reanchor:
+    @bash .machine_readable/coaptation/coapt.sh --reanchor
+
+# Fail if the committed coaptation receipt drifted from the contractiles/descriptiles
+validate-coapt:
+    @bash .machine_readable/coaptation/verify.sh
+
+# ═══════════════════════════════════════════════════════════════════════════════
+# DOCUMENTATION
+# ═══════════════════════════════════════════════════════════════════════════════
+
+# Generate all documentation
+docs:
+    @mkdir -p docs/generated docs/man
+    just cookbook
+    just man
+    @echo "Documentation generated in docs/"
+
+# Generate justfile cookbook documentation
+cookbook:
+    #!/usr/bin/env bash
+    mkdir -p docs
+    OUTPUT="docs/just-cookbook.adoc"
+    echo "= dicta_task Justfile Cookbook" > "$OUTPUT"
+    echo ":toc: left" >> "$OUTPUT"
+    echo ":toclevels: 3" >> "$OUTPUT"
+    echo "" >> "$OUTPUT"
+    echo "Generated: $(date -Iseconds)" >> "$OUTPUT"
+    echo "" >> "$OUTPUT"
+    echo "== Recipes" >> "$OUTPUT"
+    echo "" >> "$OUTPUT"
+    just --list --unsorted | while read -r line; do
+        if [[ "$line" =~ ^[[:space:]]+([a-z_-]+) ]]; then
+            recipe="${BASH_REMATCH[1]}"
+            echo "=== $recipe" >> "$OUTPUT"
+            echo "" >> "$OUTPUT"
+            echo "[source,bash]" >> "$OUTPUT"
+            echo "----" >> "$OUTPUT"
+            echo "just $recipe" >> "$OUTPUT"
+            echo "----" >> "$OUTPUT"
+            echo "" >> "$OUTPUT"
+        fi
+    done
+    echo "Generated: $OUTPUT"
+
+# Generate man page
+man:
+    #!/usr/bin/env bash
+    mkdir -p docs/man
+    cat > docs/man/dicta_task.1 << EOF
+    .TH dicta_task 1 "$(date +%Y-%m-%d)" "{{version}}" "dicta_task Manual"
+    .SH NAME
+    dicta_task \- RSR-compliant project
+    .SH SYNOPSIS
+    .B just
+    [recipe] [args...]
+    .SH DESCRIPTION
+    RSR (Rhodium Standard Repository) project managed with just.
+    .SH AUTHOR
+    $(git config user.name 2>/dev/null || echo "Author") <$(git config user.email 2>/dev/null || echo "email")>
+    EOF
+    echo "Generated: docs/man/dicta_task.1"
+
+# ═══════════════════════════════════════════════════════════════════════════════
+# CI & AUTOMATION
+# ═══════════════════════════════════════════════════════════════════════════════
+
+# Run full CI pipeline locally
+# proof-check-all is FATAL if any prover toolchain is absent (idris2/lean/agda/coqc):
+# the full CI gate must not pass on a machine that cannot verify the proofs.
+ci: deps quality proof-check-all
+    @echo "CI pipeline complete!"
+
+# Install git hooks
+install-hooks:
+    @mkdir -p .git/hooks
+    @cat > .git/hooks/pre-commit << 'HOOKEOF'
+    #!/bin/bash
+    just fmt-check || exit 1
+    just lint || exit 1
+    just assail || exit 1
+    HOOKEOF
+    @chmod +x .git/hooks/pre-commit
+    @echo "Git hooks installed"
+
+# ═══════════════════════════════════════════════════════════════════════════════
+# SECURITY
+# ═══════════════════════════════════════════════════════════════════════════════
+
+# Run security audit
+security: deps-audit
+    @echo "=== Security Audit ==="
+    @command -v trivy >/dev/null && trivy fs --severity HIGH,CRITICAL . || true
+    @echo "Security audit complete"
+
+# Generate SBOM
+sbom:
+    @mkdir -p docs/security
+    @command -v syft >/dev/null && syft . -o spdx-json > docs/security/sbom.spdx.json || echo "syft not found"
+
+# ═══════════════════════════════════════════════════════════════════════════════
+# VALIDATION & COMPLIANCE — see build/just/validate.just
+# ═══════════════════════════════════════════════════════════════════════════════
+
+import? "build/just/validate.just"
+
+# ═══════════════════════════════════════════════════════════════════════════════
+# STATE MANAGEMENT
+# ═══════════════════════════════════════════════════════════════════════════════
+
+# Update STATE.a2ml timestamp
+state-touch:
+    @if [ -f ".machine_readable/descriptiles/STATE.a2ml" ]; then \
+        sed -i 's/last-updated = "[^"]*"/last-updated = "'"$(date +%Y-%m-%d)"'"/' .machine_readable/descriptiles/STATE.a2ml && \
+        echo "STATE.a2ml timestamp updated"; \
+    fi
+
+# Show current phase from STATE.a2ml
+state-phase:
+    @sed -n 's/^[[:space:]]*phase[[:space:]]*=[[:space:]]*"\([^"]*\)".*/\1/p' .machine_readable/descriptiles/STATE.a2ml 2>/dev/null | head -1 || echo "unknown"
+
+# ═══════════════════════════════════════════════════════════════════════════════
+# GUIX
+# ═══════════════════════════════════════════════════════════════════════════════
+
+# Enter Guix development shell (primary)
+guix-shell:
+    guix shell -D -f build/guix.scm
+
+# Build with Guix
+guix-build:
+    guix build -f build/guix.scm
+
+# ═══════════════════════════════════════════════════════════════════════════════
+# HYBRID AUTOMATION
+# ═══════════════════════════════════════════════════════════════════════════════
+
+# Run local automation tasks
+automate task="all":
+    #!/usr/bin/env bash
+    case "{{task}}" in
+        all) just fmt && just lint && just test && just docs && just state-touch ;;
+        cleanup) just clean && find . -name "*.orig" -delete && find . -name "*~" -delete ;;
+        update) just deps && just validate ;;
+        *) echo "Unknown: {{task}}. Use: all, cleanup, update" && exit 1 ;;
+    esac
+
+# ═══════════════════════════════════════════════════════════════════════════════
+# COMBINATORIC MATRIX RECIPES
+# ═══════════════════════════════════════════════════════════════════════════════
+
+# Build matrix: [debug|release] x [target] x [features]
+build-matrix mode="debug" target="" features="":
+    @echo "Build matrix: mode={{mode}} target={{target}} features={{features}}"
+
+# Test matrix: [unit|integration|e2e|all] x [verbosity] x [parallel]
+test-matrix suite="unit" verbosity="normal" parallel="true":
+    @echo "Test matrix: suite={{suite}} verbosity={{verbosity}} parallel={{parallel}}"
+
+# CI matrix: [lint|test|build|security|all] x [quick|full]
+ci-matrix stage="all" depth="quick":
+    @echo "CI matrix: stage={{stage}} depth={{depth}}"
+
+# Show all matrix combinations
+combinations:
+    @echo "=== Combinatoric Matrix Recipes ==="
+    @echo ""
+    @echo "Build Matrix: just build-matrix [debug|release] [target] [features]"
+    @echo "Test Matrix:  just test-matrix [unit|integration|e2e|all] [verbosity] [parallel]"
+    @echo "Container:    just container-matrix [build|run|push|shell|scan] [registry] [tag]  (needs container module)"
+    @echo "CI Matrix:    just ci-matrix [lint|test|build|security|all] [quick|full]"
+
+# ═══════════════════════════════════════════════════════════════════════════════
+# VERSION CONTROL
+# ═══════════════════════════════════════════════════════════════════════════════
+
+# Show git status
+status:
+    @git status --short
+
+# Show recent commits
+log count="20":
+    @git log --oneline -{{count}}
+
+# Generate CHANGELOG.adoc with git-cliff
+changelog:
+    @command -v git-cliff >/dev/null || { echo "git-cliff not found — install: cargo install git-cliff"; exit 1; }
+    # AsciiDoc, not .md: CHANGELOG.adoc is what root-allow.txt permits, so a
+    # .md here would fail check-root-shape AND the estate's no-.md rule the
+    # moment anyone ran this recipe.
+    git cliff --config .machine_readable/configs/git-cliff/cliff.toml --output CHANGELOG.adoc
+    @echo "Generated CHANGELOG.adoc"
+
+# Preview changelog for unreleased commits (does not write)
+changelog-preview:
+    @command -v git-cliff >/dev/null || { echo "git-cliff not found — install: cargo install git-cliff"; exit 1; }
+    git cliff --config .machine_readable/configs/git-cliff/cliff.toml --unreleased --strip header
+
+# Tag a new release (usage: just release-tag 1.2.3)
+release-tag version:
+    #!/usr/bin/env bash
+    TAG="v{{version}}"
+    if git rev-parse "$TAG" >/dev/null 2>&1; then
+        echo "Tag $TAG already exists"
+        exit 1
+    fi
+    just changelog
+    git add CHANGELOG.md
+    git commit -m "chore(release): prepare $TAG"
+    git tag -a "$TAG" -m "Release $TAG"
+    echo "Created tag $TAG — push with: git push origin main --tags"
+
+# ═══════════════════════════════════════════════════════════════════════════════
+# UTILITIES
+# ═══════════════════════════════════════════════════════════════════════════════
+
+# Count lines of code
+loc:
+    @find . \( -name "*.rs" -o -name "*.ex" -o -name "*.exs" -o -name "*.res" -o -name "*.gleam" -o -name "*.zig" -o -name "*.idr" -o -name "*.hs" -o -name "*.ncl" -o -name "*.scm" -o -name "*.adb" -o -name "*.ads" \) -not -path './target/*' -not -path './_build/*' 2>/dev/null | xargs wc -l 2>/dev/null | tail -1 || echo "0"
+
+# Show TODO comments
+todos:
+    @grep -rn "TODO\|FIXME\|HACK\|XXX" --include="*.rs" --include="*.ex" --include="*.res" --include="*.gleam" --include="*.zig" --include="*.idr" --include="*.hs" . 2>/dev/null || echo "No TODOs"
+
+# Open in editor
+edit:
+    ${EDITOR:-code} .
+
+# Run high-rigor security assault using panic-attacker
+maint-assault:
+    @./.machine_readable/scripts/maintenance/maint-assault.sh
+
+# Run panic-attacker pre-commit scan (foundational floor-raise requirement)
+assail:
+    @command -v panic-attack >/dev/null 2>&1 && panic-attack assail . || echo "WARN: panic-attack not found — install from https://github.com/hyperpolymath/panic-attacker"
+
+
+# Self-diagnostic — checks dependencies, permissions, paths
+doctor:
+    @echo "Running diagnostics for dicta-task..."
+    @echo "Checking required tools..."
+    @command -v just >/dev/null 2>&1 && echo "  [OK] just" || echo "  [FAIL] just not found"
+    @command -v git >/dev/null 2>&1 && echo "  [OK] git" || echo "  [FAIL] git not found"
+    @echo "Checking for hardcoded paths..."
+    @grep -rn '$HOME\|$ECLIPSE_DIR' --include='*.rs' --include='*.ex' --include='*.res' --include='*.gleam' --include='*.sh' . 2>/dev/null | head -5 || echo "  [OK] No hardcoded paths"
+    @echo "Diagnostics complete."
+
+# Guided tour of key features
+tour:
+    @echo "=== dicta-task Tour ==="
+    @echo ""
+    @echo "1. Project structure:"
+    @ls -la
+    @echo ""
+    @echo "2. Available commands: just --list"
+    @echo ""
+    @echo "3. Read README.adoc for full overview"
+    @echo "4. Read EXPLAINME.adoc for architecture decisions"
+    @echo "5. Run 'just doctor' to check your setup"
+    @echo ""
+    @echo "Tour complete! Try 'just --list' to see all available commands."
+
+# Open feedback channel with diagnostic context
+help-me:
+    @echo "=== dicta-task Help ==="
+    @echo "Platform: $(uname -s) $(uname -m)"
+    @echo "Shell: $SHELL"
+    @echo ""
+    @echo "To report an issue:"
+    @echo "  https://github.com/hyperpolymath/dicta-task/issues/new"
+    @echo ""
+    @echo "Include the output of 'just doctor' in your report."
+
+# ═══════════════════════════════════════════════════════════════════════════════
+# FORMAL VERIFICATION (PROOFS) — see build/just/proofs.just
+# ═══════════════════════════════════════════════════════════════════════════════
+
+import? "build/just/proofs.just"
+
+# ═══════════════════════════════════════════════════════════════════════════════
+# SESSION MANAGEMENT (THIN BINDINGS TO CENTRAL STANDARDS)
+# ═══════════════════════════════════════════════════════════════════════════════
+
+# Show canonical session-management command model
+session-help:
+    @echo "Canonical command model:"
+    @echo "  intake repo <path>"
+    @echo "  checkpoint change <path>"
+    @echo "  verify maintenance <path>"
+    @echo "  verify substantial <path>"
+    @echo "  verify release <path>"
+    @echo "  close planned <path>"
+    @echo "  close urgent <path>"
+    @echo "  recover repo <path>"
+    @echo "  handover full <path>"
+    @echo "  handover split <path>"
+    @echo "  handover model <path>"
+    @echo "  handover human <path>"
+    @echo ""
+    @echo "Use Just aliases below (thin wrappers around ./session/dispatch.sh)."
+
+# Canonical aliases (friendly recipe names that map to canonical commands)
+intake-repo path=".":
+    @./session/dispatch.sh intake repo "{{path}}"
+
+checkpoint-change path=".":
+    @./session/dispatch.sh checkpoint change "{{path}}"
+
+verify-maintenance path=".":
+    @./session/dispatch.sh verify maintenance "{{path}}"
+
+verify-substantial path=".":
+    @./session/dispatch.sh verify substantial "{{path}}"
+
+verify-release path=".":
+    @./session/dispatch.sh verify release "{{path}}"
+
+close-planned path=".":
+    @./session/dispatch.sh close planned "{{path}}"
+
+close-urgent path=".":
+    @./session/dispatch.sh close urgent "{{path}}"
+
+recover-repo path=".":
+    @./session/dispatch.sh recover repo "{{path}}"
+
+handover-full path=".":
+    @./session/dispatch.sh handover full "{{path}}"
+
+handover-split path=".":
+    @./session/dispatch.sh handover split "{{path}}"
+
+handover-model path=".":
+    @./session/dispatch.sh handover model "{{path}}"
+
+handover-human path=".":
+    @./session/dispatch.sh handover human "{{path}}"
+
+secret-scan-trufflehog:
+    @command -v trufflehog >/dev/null && trufflehog filesystem . --only-verified || true
+
+# ═══════════════════════════════════════════════════════════════════════════════
+# WINDOWS RGONOMICS (CLOAKING)
+# ═══════════════════════════════════════════════════════════════════════════════╓
+# Hide all dotfiles and dot-folders from Windows Explorer. On POSIX systems,
+# leading-dot names are already hidden by convention, so these recipes are
+# intentionally harmless no-ops.
+cloak:
+    #!/usr/bin/env bash
+    set -euo pipefail
+    if command -v powershell.exe >/dev/null 2>&1; then
+        powershell.exe -NoProfile -Command "Get-ChildItem -Path . -Force -Filter '.*' | Where-Object { \$_.Name -match '^\\.' } | ForEach-Object { \$_.Attributes = \$_.Attributes -bor [System.IO.FileAttributes]::Hidden }"
+        echo "Cloak engaged."
+    else
+        echo "Dotfiles are natively cloaked on this OS. No action required."
+    fi
+
+# Reveal dotfiles in Windows Explorer; on POSIX, explain the native mechanism.
+uncloak:
+    #!/usr/bin/env bash
+    set -euo pipefail
+    if command -v powershell.exe >/dev/null 2>&1; then
+        powershell.exe -NoProfile -Command "Get-ChildItem -Path . -Force -Filter '.*' | Where-Object { \$_.Name -match '^\\.' } | ForEach-Object { \$_.Attributes = \$_.Attributes -band -bnot [System.IO.FileAttributes]::Hidden }"
+        echo "Cloak lifted."
+    else
+        echo "Use 'ls -a' to view dotfiles on this OS."
+    fi

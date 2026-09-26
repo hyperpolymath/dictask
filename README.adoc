@@ -1,26 +1,36 @@
-____
-[!TIP] *AI-Assisted Install:* Just tell any AI assistant: +
-`+Set+` `+up+` `+dictask+` `+from+`
-https://github.com/hyperpolymath/dictask[`+https://github.com/hyperpolymath/dictask+`] +
-The AI reads the manifest, asks you a few questions, and handles
-everything.
-____
+// SPDX-License-Identifier: CC-BY-SA-4.0
+// Copyright (c) Jonathan D.A. Jewell <j.d.a.jewell@open.ac.uk>
+// SPDX-FileCopyrightText: 2024-2026 Jonathan D.A. Jewell (hyperpolymath)
+= Dicta-Task
+:toc:
+:toc-placement: preamble
+
+// ── Licensing ───────────────────────────────────────────────────────────────
+image:https://img.shields.io/badge/Code-MPL--2.0-blue.svg?logo=mozilla[Code licence: MPL-2.0,link="https://opensource.org/licenses/MPL-2.0"]
+image:https://img.shields.io/badge/Docs-CC--BY--SA--4.0-blue.svg?logo=creativecommons[Docs licence: CC-BY-SA-4.0,link="https://creativecommons.org/licenses/by-sa/4.0/"]
+image:https://img.shields.io/badge/Provenance-Quantum--Safe-blueviolet[Quantum-Safe Provenance,link="docs/legal/EXHIBIT-B-QUANTUM-SAFE.txt"]
+
+// ── Standard & quality gates ────────────────────────────────────────────────
+image:https://img.shields.io/badge/RSR-Rhodium_Standard-9C27B0[Rhodium Standard Repository,link="https://github.com/hyperpolymath/rhodium-standard-repositories"]
+image:https://api.scorecard.dev/projects/github.com/hyperpolymath/dicta-task/badge[OpenSSF Scorecard,link="https://scorecard.dev/viewer/?uri=github.com/hyperpolymath/dicta-task"]
+image:https://sonarcloud.io/api/project_badges/measure?project=hyperpolymath_dicta-task&metric=alert_status[SonarQube Quality Gate,link="https://sonarcloud.io/summary/new_code?id=hyperpolymath_dicta-task"]
+image:https://archive.softwareheritage.org/badge/origin/https://github.com/hyperpolymath/dicta-task/[Archived in Software Heritage,link="https://archive.softwareheritage.org/browse/origin/?origin_url=https://github.com/hyperpolymath/dicta-task"]
+
+// ── Provenance & ecosystem ──────────────────────────────────────────────────
+image:https://img.shields.io/badge/Idris-Inside-5E5086?logo=idris&logoColor=white[Idris Inside,link="https://github.com/hyperpolymath/proven"]
+image:https://img.shields.io/badge/Zig-Zero--overhead-F7A41D?logo=zig&logoColor=black[Zig Zero-overhead FFI,link="https://github.com/hyperpolymath/typed-wasm"]
+image:https://api.thegreenwebfoundation.org/greencheckimage/github.com[Green Web,link="https://www.thegreenwebfoundation.org/green-web-check/?url=github.com"]
 
 == Overview
 
-*dictask* automates the ingestion of speech notes from a portable voice
+*dicta-task* automates the ingestion of speech notes from a portable voice
 recorder into a structured, prioritised, auditable task list.
 
-Plug in your recorder → dictask detects it, archives the audio,
+Plug in your recorder → dicta-task detects it, archives the audio,
 transcribes it, extracts tasks with confidence scores, deduplicates
 against your existing list, and either auto-applies high-confidence
 items or queues ambiguous ones for review.
 
-This project follows a *Dual-Track* architecture:
-
-* *Root:* High-level orientation and rich documentation for humans.
-* *Sub-directories:* Machine-readable metadata and technical
-implementation.
 
 == Architecture
 
@@ -143,7 +153,7 @@ Every task carries its full provenance chain:
 ----
 original_audio_hash (SHA-256)
   → transcript_version (Whisper v3 / Vosk v0.3.45)
-  → parser_version (dictask-parse v0.1.0)
+  → parser_version (dicta-task-parse v0.1.0)
   → change_set { timestamp, action, user_confirmation_state }
 ----
 
@@ -171,104 +181,88 @@ locally
 All pipeline stages are idempotent — reprocessing the same input
 produces the same output.
 
-== Repository Structure
+== Name
 
-[width="100%",cols="50%,50%",options="header",]
+*Dicta-Task* (from _dictate_ + _task_) was previously called `dictask`. The
+repository was renamed in September 2026; the old GitHub URL redirects.
+
+== Repository layout
+
+The RSR layout applies (see link:docs/architecture/REPOSITORY-MAP.adoc[the repository map]).
+Project-specific locations:
+
+[cols="1,3",options="header"]
 |===
-|Directory |Purpose
-|`+.github/+` |Forge-specific metadata (CODEOWNERS, SECURITY.md,
-workflows).
-
-|`+.machine_readable/+` |Canonical project state (6 a2ml files), bot
-directives, and AI guides.
-
-|`+src/ingest/+` |Rust crate: udev detection, file archival, cloud
-upload.
-
-|`+src/transcribe/+` |Rust crate: Whisper/Vosk ASR integration.
-
-|`+src/parse/+` |Haskell package: megaparsec NLP task extraction.
-
-|`+src/store/+` |Rust crate: SQLite canonical store + view generation.
-
-|`+src/review/+` |Rust crate: review queue + notification.
-
-|`+src/interface/+` |Verified Interface Seams (Idris2 ABI, Zig FFI,
-generated C headers).
-
-|`+deploy/ansible/+` |Ansible playbooks for local machine setup.
-
-|`+deploy/terraform/+` |Terraform configs for cloud provisioning
-(bucket, IAM).
-
-|`+schemas/+` |SQLite schema, JSON schemas for intermediate formats.
-
-|`+container/+` |Stapeln container ecosystem.
-
-|`+docs/+` |Technical documentation (architecture, theory, practice).
+| Path | What lives there
+| `src/ingest/` | Rust crate: udev detection, archival (SHA-256), encrypted backup.
+| `src/transcribe/` | Rust crate: offline ASR (Whisper/Vosk).
+| `src/parse/` | Haskell package `dicta-task-parse`: megaparsec task extraction, dates, priority, dedup.
+| `src/store/` | Rust crate: SQLite canonical store + Markdown/JSON views.
+| `src/interface/` | Idris2 ABI (`Abi/Task.idr`), Zig FFI, generated C header.
+| `src/definitions/schemas/` | SQLite schema, JSON schema for candidate intents, CUE config schema.
+| `src/definitions/config.ncl` | Default pipeline configuration (Nickel).
+| `build/deploy/` | Ansible (local machine) and Terraform (cloud backup bucket).
+| `build/container/` | Stapeln container build.
+| `docs/` | Human documentation (architecture, onboarding, status, decisions).
+| `.machine_readable/` | Descriptiles, contractiles, policies read by tools.
 |===
 
-== Quick Start
+== Quick start
 
 [source,bash]
 ----
-just init              # Interactive bootstrap
-just build             # Build all components
-just test              # Run all tests
-just ingest            # Run ingest pipeline manually
-just transcribe FILE   # Transcribe a specific audio file
-just parse FILE        # Parse a transcript file
-just views             # Generate Markdown/JSON/CSV views
-just container-build   # Build verified OCI image
+just                   # list all recipes
+just build             # build all components
+just test              # run all tests
+just validate          # RSR structure + metadata checks
+----
+
+Per component, until the root recipes are wired to them:
+
+[source,bash]
+----
+(cd src/parse && cabal test)            # Haskell parser + tests
+(cd src/store && cargo test)            # Rust store
+(cd src/ingest && cargo run -- /media/recorder)
 ----
 
 == Deployment
 
-=== Local Setup (Ansible)
-
 [source,bash]
 ----
-cd deploy/ansible
-ansible-playbook setup.yml
+(cd build/deploy/ansible && ansible-playbook setup.yml)   # udev, systemd, toolchains, SQLite
+(cd build/deploy/terraform && terraform init && terraform apply)  # encrypted bucket, IAM
 ----
-
-Sets up: udev rules, systemd service, Rust/Haskell toolchains, SQLite.
-
-=== Cloud Provisioning (Terraform)
-
-[source,bash]
-----
-cd deploy/terraform
-terraform init
-terraform apply
-----
-
-Provisions: encrypted storage bucket, IAM roles, lifecycle rules.
 
 == Testing
 
 * *Haskell parser:* HSpec + QuickCheck property-based tests
-* *Rust components:* `+cargo+` `+test+` with integration tests against
-real SQLite
-* *Pipeline replay:* Re-run historical audio through newer parser
-versions
-* *Idris2 proofs:* Compile-time verification (no runtime tests needed)
+* *Rust components:* `cargo test` with integration tests against real SQLite
+* *Pipeline replay:* re-run historical audio through newer parser versions
+* *Idris2 proofs:* compile-time verification
 
-== Success Metrics
+== Success metrics
 
-* % of tasks auto-processed vs. requiring manual review
+* % of tasks auto-processed vs. requiring manual review
 * False positive/negative rates for intent detection
-* Time saved vs. manual note-taking and task entry
+* Time saved vs. manual note-taking and task entry
 * Pipeline end-to-end latency (target: < 5 minutes per recording)
 
-== Documentation
+== Where to go next
 
-* link:CONTRIBUTING.adoc[Contributing Guide]
-* link:ROADMAP.adoc[Roadmap]
-* link:TOPOLOGY.md[Architecture Topology]
-* link:docs/architecture/[Architecture Details]
+* link:docs/architecture/REPOSITORY-MAP.adoc[The repository map] — generated; what every directory is for.
+* link:docs/EXPLAINME.adoc[EXPLAINME] — the engineering deep-dive: how the pieces actually work.
+* link:docs/AFFIRMATION.adoc[AFFIRMATION] — the dated, signed honesty snapshot of the repo's true state.
+* link:docs/AUDIT.adoc[AUDIT] — the release audit gate.
+* link:docs/status/ROADMAP.adoc[ROADMAP] — what is built and what comes next.
+* link:docs/architecture/TOPOLOGY.adoc[TOPOLOGY] — pipeline topology and completion dashboard.
+* link:docs/decisions/0004-storage-backend.adoc[ADR-0004] — why SQLite stays canonical (and where LMDB fits).
 
-== License
+== Licence
 
-SPDX-License-Identifier: CC-BY-SA-4.0 +
-See LICENSE and docs/legal/ for details.
+Code, configuration and scripts are link:LICENSE[Mozilla Public License 2.0]
+(`MPL-2.0`); prose documentation is `CC-BY-SA-4.0`. Both texts live in
+`LICENSES/`, and per-file `SPDX-License-Identifier` headers are authoritative.
+The GitHub-detected licence is MPL-2.0 (the root `LICENSE`). Long-term
+attribution uses Quantum-Safe Provenance — see
+link:docs/legal/EXHIBIT-B-QUANTUM-SAFE.txt[the Quantum-Safe Provenance exhibit].

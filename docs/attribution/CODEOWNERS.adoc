@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: CC-BY-SA-4.0
+// Copyright (c) Jonathan D.A. Jewell <j.d.a.jewell@open.ac.uk>
 = Code Ownership
 :icons: font
 
@@ -16,4 +18,4 @@ The technical rules for automatic review assignments are maintained in the machi
 
 == Component Owners
 
-A full list of maintainers and their contact information can be found in link:MAINTAINERS.adoc[MAINTAINERS.adoc].
+A full list of maintainers and their contact information can be found in link:../MAINTAINERS.adoc[MAINTAINERS.adoc].

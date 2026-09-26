@@ -1,4 +1,5 @@
 // SPDX-License-Identifier: CC-BY-SA-4.0
+// Copyright (c) Jonathan D.A. Jewell <j.d.a.jewell@open.ac.uk>
 = TOPOLOGY.md — Generation Guide
 Jonathan D.A. Jewell (hyperpolymath) <j.d.a.jewell@open.ac.uk>
 :toc:
@@ -61,7 +62,7 @@ The file must contain exactly three sections:
 Add a header comment with SPDX-License-Identifier and Last updated date.
 End with an "Update Protocol" section explaining how to maintain the file.
 
-Use the template at TOPOLOGY.md in rsr-template-repo as a structural reference,
+Use the template at TOPOLOGY.md in dicta-task as a structural reference,
 but make the content completely specific to THIS project.
 ----
 
@@ -69,7 +70,7 @@ but make the content completely specific to THIS project.
 
 [source,bash]
 ----
-cp /path/to/rsr-template-repo/TOPOLOGY.md ./TOPOLOGY.md
+cp /path/to/dicta-task/TOPOLOGY.md ./TOPOLOGY.md
 # Then edit: replace placeholders, draw the real architecture, fill the dashboard
 ----
 
@@ -145,7 +146,7 @@ TOPOLOGY.md complements but does not replace:
 - **STATE.a2ml** — machine-readable state (tasks, blockers, next actions)
 - **ECOSYSTEM.a2ml** — position in the wider project ecosystem
 - **META.a2ml** — architecture decisions and design rationale
-- **0-AI-MANIFEST.a2ml** — AI agent entry point and invariants
+- ***_chora.deed (repo deed)** — AI agent entry point: allocation policy and directory invariants
 
 TOPOLOGY.md is the _visual summary_ for humans; the a2ml files are the
 _structured data_ for tooling. Both should agree.

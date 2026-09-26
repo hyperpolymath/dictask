@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: MPL-2.0
 // Copyright (c) 2026 Jonathan D.A. Jewell (hyperpolymath) <j.d.a.jewell@open.ac.uk>
 //
-// Zig FFI bridge for dictask — C-compatible interface between
+// Zig FFI bridge for dicta-task — C-compatible interface between
 // Idris2 ABI definitions and Rust consumer components.
 
 const std = @import("std");
@@ -110,27 +110,27 @@ pub const CCandidateIntent = extern struct {
 // ============================================================================
 
 /// Create a new Confidence value, clamped to [0.0, 1.0].
-export fn dictask_confidence_new(value: f64) f64 {
+pub export fn dicta_task_confidence_new(value: f64) f64 {
     return Confidence.init(value).value;
 }
 
 /// Check if confidence is high (>= 0.8).
-export fn dictask_confidence_is_high(value: f64) bool {
+pub export fn dicta_task_confidence_is_high(value: f64) bool {
     return Confidence.init(value).isHigh();
 }
 
 /// Check if confidence is medium (0.3-0.8).
-export fn dictask_confidence_is_medium(value: f64) bool {
+pub export fn dicta_task_confidence_is_medium(value: f64) bool {
     return Confidence.init(value).isMedium();
 }
 
 /// Check if confidence is low (< 0.3).
-export fn dictask_confidence_is_low(value: f64) bool {
+pub export fn dicta_task_confidence_is_low(value: f64) bool {
     return Confidence.init(value).isLow();
 }
 
 /// Compute priority score from weighted components.
-export fn dictask_priority_compute(urgency: f64, importance: f64, deadline_proximity: f64) f64 {
+pub export fn dicta_task_priority_compute(urgency: f64, importance: f64, deadline_proximity: f64) f64 {
     const ps = PriorityScore{
         .urgency = urgency,
         .importance = importance,

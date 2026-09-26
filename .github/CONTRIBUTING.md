@@ -1,13 +1,18 @@
+<!--
+SPDX-License-Identifier: CC-BY-SA-4.0
+Copyright (c) Jonathan D.A. Jewell <j.d.a.jewell@open.ac.uk>
+-->
+```
 # Clone the repository
-git clone https://github.com/hyperpolymath/dictask.git
-cd dictask
+git clone https://github.com/hyperpolymath/dicta-task.git
+cd dicta-task
 
 # Using Guix (recommended for reproducibility)
-guix develop
+guix shell -D -f build/guix.scm
 
 # Or using toolbox/distrobox
-toolbox create dictask-dev
-toolbox enter dictask-dev
+toolbox create dicta-task-dev
+toolbox enter dicta-task-dev
 # Install dependencies manually
 
 # Verify setup
@@ -16,39 +21,15 @@ just test    # Run test suite
 ```
 
 ### Repository Structure
-```
-dictask/
-├── src/                 # Source code (Perimeter 1-2)
-├── lib/                 # Library code (Perimeter 1-2)
-├── extensions/          # Extensions (Perimeter 2)
-├── plugins/             # Plugins (Perimeter 2)
-├── tools/               # Tooling (Perimeter 2)
-├── docs/                # Documentation (Perimeter 3)
-│   ├── architecture/    # ADRs, specs (Perimeter 2)
-│   └── proposals/       # RFCs (Perimeter 3)
-├── examples/            # Examples (Perimeter 3)
-├── spec/                # Spec tests (Perimeter 3)
-├── tests/               # Test suite (Perimeter 2-3)
-├── .machine_readable/   # ALL machine-readable content (Perimeter 1)
-│   ├── *.a2ml           # State files (STATE, META, ECOSYSTEM, etc.)
-│   ├── bot_directives/  # Bot configs
-│   └── contractiles/    # Policy contracts (k9, dust, lust, must, trust)
-├── .well-known/         # Protocol files (Perimeter 1-3)
-├── .github/             # GitHub config (Perimeter 1)
-│   ├── CONTRIBUTING.md  # This file
-│   ├── ISSUE_TEMPLATE/
-│   └── workflows/
-├── CHANGELOG.md
-├── CODE_OF_CONDUCT.md
-├── GOVERNANCE.md
-├── LICENSE
-├── MAINTAINERS.md
-├── README.adoc
-├── SECURITY.md
-├── flake.guix            # Guix flake — fallback (Perimeter 1)
-├── guix.scm             # Guix package — primary (Perimeter 1)
-└── Justfile             # Task runner
-```
+
+The authoritative map is **generated** from the tree and checked in CI, so it
+cannot drift:
+[`docs/architecture/REPOSITORY-MAP.adoc`](../docs/architecture/REPOSITORY-MAP.adoc).
+Regenerate it with `just repo-map`.
+
+A hand-written tree used to live here. It described `lib/`, `extensions/`,
+`plugins/` and `spec/` directories that this repository has never contained,
+which is precisely why the map is now generated rather than typed.
 
 ---
 
@@ -74,7 +55,7 @@ Use the [bug report template](.github/ISSUE_TEMPLATE/bug_report.md) and include:
 ### Suggesting Features
 
 **Before suggesting**:
-1. Check the [roadmap](ROADMAP.md) if available
+1. Check the [roadmap](../docs/status/ROADMAP.adoc) if available
 2. Search existing issues and discussions
 3. Consider which perimeter the feature belongs to
 
@@ -91,10 +72,10 @@ Use the [feature request template](.github/ISSUE_TEMPLATE/feature_request.md) an
 
 Look for issues labelled:
 
-- [`good first issue`](https://github.com/hyperpolymath/dictask/labels/good%20first%20issue) — Simple Perimeter 3 tasks
-- [`help wanted`](https://github.com/hyperpolymath/dictask/labels/help%20wanted) — Community help needed
-- [`documentation`](https://github.com/hyperpolymath/dictask/labels/documentation) — Docs improvements
-- [`perimeter-3`](https://github.com/hyperpolymath/dictask/labels/perimeter-3) — Community sandbox scope
+- [`good first issue`](https://github.com/hyperpolymath/dicta-task/labels/good%20first%20issue) — Simple Perimeter 3 tasks
+- [`help wanted`](https://github.com/hyperpolymath/dicta-task/labels/help%20wanted) — Community help needed
+- [`documentation`](https://github.com/hyperpolymath/dicta-task/labels/documentation) — Docs improvements
+- [`perimeter-3`](https://github.com/hyperpolymath/dicta-task/labels/perimeter-3) — Community sandbox scope
 
 ---
 
@@ -119,3 +100,4 @@ We follow [Conventional Commits](https://www.conventionalcommits.org/):
 [optional body]
 
 [optional footer]
+```

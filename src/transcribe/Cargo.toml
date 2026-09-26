@@ -1,10 +1,10 @@
 # SPDX-License-Identifier: MPL-2.0
 [package]
-name = "dictask-transcribe"
+name = "dicta-task-transcribe"
 version = "0.1.0"
 edition = "2024"
 authors = ["Jonathan D.A. Jewell <j.d.a.jewell@open.ac.uk>"]
-description = "Offline ASR transcription for dictask (Whisper/Vosk)"
+description = "Offline ASR transcription for dicta-task (Whisper/Vosk)"
 license = "LicenseRef-MPL-2.0"
 
 [dependencies]

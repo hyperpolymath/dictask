@@ -3,10 +3,10 @@ module Main (main) where
 
 import Test.Hspec
 
-import qualified Test.Dictask.Parse.IntentSpec as IntentSpec
-import qualified Test.Dictask.Parse.ConfidenceSpec as ConfidenceSpec
-import qualified Test.Dictask.Parse.DateResolverSpec as DateResolverSpec
-import qualified Test.Dictask.Parse.DedupSpec as DedupSpec
+import qualified Test.DictaTask.Parse.IntentSpec as IntentSpec
+import qualified Test.DictaTask.Parse.ConfidenceSpec as ConfidenceSpec
+import qualified Test.DictaTask.Parse.DateResolverSpec as DateResolverSpec
+import qualified Test.DictaTask.Parse.DedupSpec as DedupSpec
 
 main :: IO ()
 main = hspec $ do

@@ -1,182 +1,48 @@
-// {{PROJECT}} Integration Tests
 // SPDX-License-Identifier: MPL-2.0
+// Copyright (c) 2026 Jonathan D.A. Jewell (hyperpolymath) <j.d.a.jewell@open.ac.uk>
 //
-// These tests verify that the Zig FFI correctly implements the Idris2 ABI
-
+// dicta-task FFI integration tests: exercise the exported C ABI exactly as a
+// Rust/C consumer would, and pin the invariants declared in Abi/Task.idr.
 const std = @import("std");
 const testing = std.testing;
+const ffi = @import("dicta_task_ffi");
 
-// Import FFI functions
-extern fn {{project}}_init() ?*opaque {};
-extern fn {{project}}_free(?*opaque {}) void;
-extern fn {{project}}_process(?*opaque {}, u32) c_int;
-extern fn {{project}}_get_string(?*opaque {}) ?[*:0]const u8;
-extern fn {{project}}_free_string(?[*:0]const u8) void;
-extern fn {{project}}_last_error() ?[*:0]const u8;
-extern fn {{project}}_version() [*:0]const u8;
-extern fn {{project}}_is_initialized(?*opaque {}) u32;
-
-//==============================================================================
-// Lifecycle Tests
-//==============================================================================
-
-test "create and destroy handle" {
-    const handle = {{project}}_init() orelse return error.InitFailed;
-    defer {{project}}_free(handle);
-
-    try testing.expect(handle != null);
+test "confidence is clamped to [0,1]" {
+    try testing.expectEqual(@as(f64, 1.0), ffi.dicta_task_confidence_new(7.0));
+    try testing.expectEqual(@as(f64, 0.0), ffi.dicta_task_confidence_new(-3.0));
+    try testing.expectEqual(@as(f64, 0.42), ffi.dicta_task_confidence_new(0.42));
 }
 
-test "handle is initialized" {
-    const handle = {{project}}_init() orelse return error.InitFailed;
-    defer {{project}}_free(handle);
-
-    const initialized = {{project}}_is_initialized(handle);
-    try testing.expectEqual(@as(u32, 1), initialized);
-}
-
-test "null handle is not initialized" {
-    const initialized = {{project}}_is_initialized(null);
-    try testing.expectEqual(@as(u32, 0), initialized);
-}
-
-//==============================================================================
-// Operation Tests
-//==============================================================================
-
-test "process with valid handle" {
-    const handle = {{project}}_init() orelse return error.InitFailed;
-    defer {{project}}_free(handle);
-
-    const result = {{project}}_process(handle, 42);
-    try testing.expectEqual(@as(c_int, 0), result); // 0 = ok
-}
-
-test "process with null handle returns error" {
-    const result = {{project}}_process(null, 42);
-    try testing.expectEqual(@as(c_int, 4), result); // 4 = null_pointer
-}
-
-//==============================================================================
-// String Tests
-//==============================================================================
-
-test "get string result" {
-    const handle = {{project}}_init() orelse return error.InitFailed;
-    defer {{project}}_free(handle);
-
-    const str = {{project}}_get_string(handle);
-    defer if (str) |s| {{project}}_free_string(s);
-
-    try testing.expect(str != null);
-}
-
-test "get string with null handle" {
-    const str = {{project}}_get_string(null);
-    try testing.expect(str == null);
-}
-
-//==============================================================================
-// Error Handling Tests
-//==============================================================================
-
-test "last error after null handle operation" {
-    _ = {{project}}_process(null, 0);
-
-    const err = {{project}}_last_error();
-    try testing.expect(err != null);
-
-    if (err) |e| {
-        const err_str = std.mem.span(e);
-        try testing.expect(err_str.len > 0);
+test "confidence bands partition [0,1] with no gaps or overlaps" {
+    var i: usize = 0;
+    while (i <= 100) : (i += 1) {
+        const v = @as(f64, @floatFromInt(i)) / 100.0;
+        var bands: u8 = 0;
+        if (ffi.dicta_task_confidence_is_high(v)) bands += 1;
+        if (ffi.dicta_task_confidence_is_medium(v)) bands += 1;
+        if (ffi.dicta_task_confidence_is_low(v)) bands += 1;
+        try testing.expectEqual(@as(u8, 1), bands);
     }
 }
 
-test "no error after successful operation" {
-    const handle = {{project}}_init() orelse return error.InitFailed;
-    defer {{project}}_free(handle);
-
-    _ = {{project}}_process(handle, 0);
-
-    // Error should be cleared after successful operation
-    // (This depends on implementation)
+test "confidence band boundaries (0.3 medium, 0.8 high)" {
+    try testing.expect(ffi.dicta_task_confidence_is_low(0.2999));
+    try testing.expect(ffi.dicta_task_confidence_is_medium(0.3));
+    try testing.expect(ffi.dicta_task_confidence_is_medium(0.7999));
+    try testing.expect(ffi.dicta_task_confidence_is_high(0.8));
 }
 
-//==============================================================================
-// Version Tests
-//==============================================================================
-
-test "version string is not empty" {
-    const ver = {{project}}_version();
-    const ver_str = std.mem.span(ver);
-
-    try testing.expect(ver_str.len > 0);
+test "priority = 0.5*urgency + 0.3*importance + 0.2*deadline" {
+    try testing.expectApproxEqAbs(@as(f64, 1.0), ffi.dicta_task_priority_compute(1, 1, 1), 1e-12);
+    try testing.expectApproxEqAbs(@as(f64, 0.0), ffi.dicta_task_priority_compute(0, 0, 0), 1e-12);
+    try testing.expectApproxEqAbs(@as(f64, 0.5), ffi.dicta_task_priority_compute(1, 0, 0), 1e-12);
+    try testing.expectApproxEqAbs(@as(f64, 0.3), ffi.dicta_task_priority_compute(0, 1, 0), 1e-12);
+    try testing.expectApproxEqAbs(@as(f64, 0.2), ffi.dicta_task_priority_compute(0, 0, 1), 1e-12);
 }
 
-test "version string is semantic version format" {
-    const ver = {{project}}_version();
-    const ver_str = std.mem.span(ver);
-
-    // Should be in format X.Y.Z
-    try testing.expect(std.mem.count(u8, ver_str, ".") >= 1);
-}
-
-//==============================================================================
-// Memory Safety Tests
-//==============================================================================
-
-test "multiple handles are independent" {
-    const h1 = {{project}}_init() orelse return error.InitFailed;
-    defer {{project}}_free(h1);
-
-    const h2 = {{project}}_init() orelse return error.InitFailed;
-    defer {{project}}_free(h2);
-
-    try testing.expect(h1 != h2);
-
-    // Operations on h1 should not affect h2
-    _ = {{project}}_process(h1, 1);
-    _ = {{project}}_process(h2, 2);
-}
-
-test "double free is safe" {
-    const handle = {{project}}_init() orelse return error.InitFailed;
-
-    {{project}}_free(handle);
-    {{project}}_free(handle); // Should not crash
-}
-
-test "free null is safe" {
-    {{project}}_free(null); // Should not crash
-}
-
-//==============================================================================
-// Thread Safety Tests (if applicable)
-//==============================================================================
-
-test "concurrent operations" {
-    const handle = {{project}}_init() orelse return error.InitFailed;
-    defer {{project}}_free(handle);
-
-    const ThreadContext = struct {
-        h: *opaque {},
-        id: u32,
-    };
-
-    const thread_fn = struct {
-        fn run(ctx: ThreadContext) void {
-            _ = {{project}}_process(ctx.h, ctx.id);
-        }
-    }.run;
-
-    var threads: [4]std.Thread = undefined;
-    for (&threads, 0..) |*thread, i| {
-        thread.* = try std.Thread.spawn(.{}, thread_fn, .{
-            ThreadContext{ .h = handle, .id = @intCast(i) },
-        });
-    }
-
-    for (threads) |thread| {
-        thread.join();
-    }
+test "enum discriminants match SQLite CHECK / Idris2 ABI ordering" {
+    try testing.expectEqual(@as(u8, 0), @intFromEnum(ffi.TaskStatus.pending));
+    try testing.expectEqual(@as(u8, 4), @intFromEnum(ffi.TaskStatus.cancelled));
+    try testing.expectEqual(@as(u8, 2), @intFromEnum(ffi.ReviewState.rejected));
+    try testing.expectEqual(@as(u8, 6), @intFromEnum(ffi.IntentType.note));
 }
