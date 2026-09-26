@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: MPL-2.0
 // Copyright (c) 2026 Jonathan D.A. Jewell (hyperpolymath) <j.d.a.jewell@open.ac.uk>
 //
-//! dictask transcription: offline ASR using Whisper or Vosk.
+//! dicta-task transcription: offline ASR using Whisper or Vosk.
 //!
 //! Pipeline stage 4: Convert audio files to text transcripts.
 //! Produces structured JSON with word-level timing and confidence.

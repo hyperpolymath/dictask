@@ -1,34 +1,36 @@
-= Dictask - Citation Guide
+// SPDX-License-Identifier: CC-BY-SA-4.0
+// Copyright (c) Jonathan D.A. Jewell <j.d.a.jewell@open.ac.uk>
+= Dicta-Task - Citation Guide
 :toc:
 
 == BibTeX
 
 [source,bibtex]
 ----
-@software{Dictask_2026,
-  author = {Jewell, Jonathan},
-  title = {Dictask},
+@software{Dicta-Task_2026,
+  author = {Jewell, Jonathan D.A.},
+  title = {Dicta-Task},
   year = {2026},
-  url = {https://github.com/hyperpolymath/Dictask},
+  url = {https://github.com/hyperpolymath/Dicta-Task},
   license = {MPL-2.0}
 }
 ----
 
 == Harvard Style
 
-Jewell, J.D.A. (2026) _Dictask_ [Computer software]. Available at: https://github.com/hyperpolymath/Dictask
+Jewell, J. (2026) _Dicta-Task_ [Computer software]. Available at: https://github.com/hyperpolymath/Dicta-Task
 
 == OSCOLA
 
-Jonathan D.A. Jewell, 'Dictask' (2026) <https://github.com/hyperpolymath/Dictask>
+Jonathan D.A. Jewell, 'Dicta-Task' (2026) <https://github.com/hyperpolymath/Dicta-Task>
 
 == MLA
 
-Jewell, Jonathan "Dictask." 2026, github.com/hyperpolymath/Dictask.
+Jewell, Jonathan D.A. "Dicta-Task." 2026, github.com/hyperpolymath/Dicta-Task.
 
 == APA 7
 
-Jewell, J.D.A. (2026). _Dictask_ [Computer software]. GitHub. https://github.com/hyperpolymath/Dictask
+Jewell, J. (2026). _Dicta-Task_ [Computer software]. GitHub. https://github.com/hyperpolymath/Dicta-Task
 
 == See Also
 

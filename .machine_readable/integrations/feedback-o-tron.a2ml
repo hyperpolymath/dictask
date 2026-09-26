@@ -1,5 +1,6 @@
 # SPDX-License-Identifier: MPL-2.0
-# Feedback-o-Tron Integration — Autonomous Bug Reporting
+# OPTIONAL: Feedback-o-Tron Integration — Autonomous Bug Reporting
+# Delete this file if your project does not use feedback-o-tron.
 
 [integration]
 name = "feedback-o-tron"

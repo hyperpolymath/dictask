@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: CC-BY-SA-4.0
+// Copyright (c) Jonathan D.A. Jewell <j.d.a.jewell@open.ac.uk>
 = Maintenance Checklist
 # Maintenance Checklist (Cross-Repo)
 
@@ -50,7 +52,7 @@ Before Axis 2/3 execution, assemble a scoped worklist from evidence:
 - [ ] Audit compliance seams/compromises explicitly:
   - policy exceptions are recorded with rationale, scope, and expiry/review
   - exception does not silently broaden into general policy drift
-  - language-policy contamination checks run (example: a single TS exception must not trigger broad TypeScript conversion)
+  - language-policy contamination checks run (example: a single TS exception must not trigger broad  conversion)
   - run `panic-attack` as the compliance-audit scanner
   - run ecological checking under effects (using sustainabot guidance as current baseline)
 
@@ -91,20 +93,20 @@ Run this pass at the end of a corrective/adaptive/perfective cycle:
 - [ ] Keep machine-readable canonical structure under `.machine_readable/`:
   - state/meta/ecosystem files (`*.a2ml` or repo standard)
   - `anchors/ANCHOR.a2ml`
-  - `contractiles/` (`must`, `trust`, `lust`, and related)
+  - `contractiles/` (`must`, `trust`, `intend`, and related)
   - `ai/` for AI guidance files
   - `bot_directives/` for bot control files
 - [ ] Keep contractiles/invariants present and wired:
   - root `Mustfile` (or equivalent) with enforceable checks
   - `Trustfile` and `Intentfile` present
 - [ ] Keep security metadata present:
-  - `.well-known/security.txt` and relevant policy metadata
+  - `www/.well-known/security.txt` and relevant policy metadata
   - CI security scanning configured and runnable
 - [ ] Keep docs and navigation coherent:
   - single navigation entry point in root (`NAVIGATION.adoc` or equivalent)
   - no duplicate conflicting docs for same purpose (for example both `.md` and `.adoc` in root unless intentionally required)
 - [ ] Enforce ABI/FFI purity where the policy applies:
-  - ABI definitions in Idris2 (`src/abi/*.idr`)
+  - ABI definitions in Idris2 (`src/interface/Abi/*.idr`)
   - FFI implementations in Zig (`ffi/**/*.zig`)
 - [ ] Ensure quality gate includes: formatting, lint, unit/integration tests, p2p/e2e checks, benchmark smoke, docs checks, security scan.
 
@@ -115,7 +117,7 @@ Run this pass at the end of a corrective/adaptive/perfective cycle:
   - `docs/` (theory/practice/whitepapers/proofs/reports)
   - `tests/` (fixtures/outputs)
   - `docs/legal/` (while retaining root `LICENSE` when forge detection needs it)
-- [ ] Maintain `.well-known/` for public metadata where applicable (`security.txt`, `humans.txt`, `ads.txt` mirrors if used).
+- [ ] Maintain `www/.well-known/` for public metadata where applicable (`security.txt`, `humans.txt`, `ads.txt` mirrors if used); a root `.well-known/` is legacy (issue #53).
 - [ ] Keep CI policy checks for doc-format conventions and canonical file placement.
 - [ ] Keep roadmap/status docs honest with dated evidence.
 
@@ -140,7 +142,7 @@ Do **not** move the following out of root if you want default tool behavior:
 Use the helper script first, then use the checklist for deeper/manual follow-up.
 
 Script locations:
-- `/var$REPOS_DIR/run-maintenance.sh`
+- `${REPOS_ROOT:-~/Documents/hyperpolymath-repos}/run-maintenance.sh`
 - `~/Desktop/run-maintenance.sh`
 
 ```bash
@@ -259,7 +261,7 @@ find . -type f \( -name '*.idr' -o -name '*.idris2' -o -name '*.zig' \)
 - [ ] Re-run until acceptable.
 
 ```bash
-PANIC_BIN="/var$REPOS_DIR/panic-attacker/target/release/panic-attack"
+PANIC_BIN="${REPOS_ROOT:-~/Documents/hyperpolymath-repos}/panic-attacker/target/release/panic-attack"
 "$PANIC_BIN" assail "$REPO" --output /tmp/assail.json --output-format json --quiet
 jq -r '.weak_points | length' /tmp/assail.json
 jq -r '.weak_points[] | "\(.severity)|\(.location)|\(.description)"' /tmp/assail.json
@@ -410,7 +412,7 @@ Add these checks for language/compiler repositories with formal ABI/FFI constrai
 - [x] README structure restored (index/TOC, audience paths, quickstart sanity).
 - [x] Wiki split by audience (laypeople/users/developers) and linked from docs index.
 - [x] Root-level clutter reduced (archive, analysis, reports relegated to `docs/` subtrees).
-- [x] Machine-readable docs synchronized (`STATE.scm`, `META.scm`, `ECOSYSTEM.scm`, contractiles).
+- [x] Machine-readable docs synchronized (`STATE.a2ml`, `META.a2ml`, `ECOSYSTEM.a2ml`, contractiles).
 - [x] Human-readable docs synchronized (`README`, `QUICK_STATUS`, roadmap, wiki home).
 - [x] `Mustfile` invariants present and enforceable in CI.
 - [x] `Trustfile` and `Intentfile` present and complete.
@@ -550,20 +552,20 @@ Fail closed: if evidence is missing for any checklist item, treat that item as N
 For centralized coverage across existing and new repos:
 
 ```bash
-cd /var$REPOS_DIR/gitbot-fleet
+cd ${REPOS_ROOT:-~/Documents/hyperpolymath-repos}/gitbot-fleet
 just enroll-repos
 ```
 
 Optional directive write-back to repos that already have `.machine_readable/`:
 
 ```bash
-cd /var$REPOS_DIR/gitbot-fleet
+cd ${REPOS_ROOT:-~/Documents/hyperpolymath-repos}/gitbot-fleet
 just enroll-repos /var$REPOS_DIR true
 ```
 
 Release hard gate from fleet:
 
 ```bash
-cd /var$REPOS_DIR/gitbot-fleet
+cd ${REPOS_ROOT:-~/Documents/hyperpolymath-repos}/gitbot-fleet
 just maintenance-hard-pass /absolute/path/to/repo
 ```

@@ -7,3 +7,20 @@ Changelog], and this project adheres to
 https://semver.org/spec/v2.0.0.html[Semantic Versioning].
 
 === [Unreleased]
+
+==== Changed
+
+* *Renamed* `dictask` → `dicta-task` (Haskell modules `Dictask.*` → `DictaTask.*`,
+  package `dicta-task-parse`, crates `dicta-task-{ingest,store,transcribe}`,
+  env/C prefix `DICTA_TASK_`, VeriSimDB collection `dicta-task:tasks`).
+* Re-based on `rsr-template-repo` @ `05bf1b9` via `just repo-init`: RSR root shape,
+  repo deed (`dicta-task_chora.deed`), descriptiles, contractiles, CI gates.
+* Moved `schemas/` and `configs/config.ncl` → `src/definitions/`,
+  `deploy/` → `build/deploy/`, root docs → `docs/{architecture,status,onboarding}/`,
+  `src/interface/abi/Task.idr` → `src/interface/Abi/Task.idr` (module `Abi.Task`).
+* `just build` / `just test` now drive cargo (per crate) and cabal.
+* Clade identity re-derived for the new name (uuid `7aff6bbd-…`); previous name recorded.
+
+==== Added
+
+* ADR-0004: SQLite remains canonical; storage goes behind a `TaskStore` trait, LMDB only as a future side store.

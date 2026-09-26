@@ -1,10 +1,10 @@
 # SPDX-License-Identifier: MPL-2.0
 [package]
-name = "dictask-store"
+name = "dicta-task-store"
 version = "0.1.0"
 edition = "2024"
 authors = ["Jonathan D.A. Jewell <j.d.a.jewell@open.ac.uk>"]
-description = "SQLite canonical task store and view generation for dictask"
+description = "SQLite canonical task store and view generation for dicta-task"
 license = "LicenseRef-MPL-2.0"
 
 [dependencies]

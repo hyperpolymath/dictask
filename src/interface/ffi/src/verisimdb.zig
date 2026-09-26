@@ -1,15 +1,15 @@
 // SPDX-License-Identifier: MPL-2.0
 // Copyright (c) 2026 Jonathan D.A. Jewell (hyperpolymath) <j.d.a.jewell@open.ac.uk>
 //
-// dictask :: src/interface/ffi/src/verisimdb.zig
+// dicta-task :: src/interface/ffi/src/verisimdb.zig
 //
 // VeriSimDB persistence client for extracted task store.
 //
-// Dual-writes task records to VeriSimDB (collection: dictask:tasks) alongside
+// Dual-writes task records to VeriSimDB (collection: dicta-task:tasks) alongside
 // the primary SQLite store. This enables Hypatia analysis of task patterns
 // across recording sessions and cross-device sync via VeriSimDB replication.
 //
-// ## Collection schema (dictask:tasks)
+// ## Collection schema (dicta-task:tasks)
 //
 // ```json
 // {
@@ -42,7 +42,7 @@ const std = @import("std");
 // ---------------------------------------------------------------------------
 
 const DEFAULT_URL = "http://localhost:8080";
-const COLLECTION  = "dictask:tasks";
+const COLLECTION  = "dicta-task:tasks";
 
 // ---------------------------------------------------------------------------
 // Public types
@@ -64,9 +64,9 @@ pub const TaskRecord = struct {
 // Public API
 // ---------------------------------------------------------------------------
 
-/// Dual-write a task record to VeriSimDB (collection: dictask:tasks).
+/// Dual-write a task record to VeriSimDB (collection: dicta-task:tasks).
 ///
-/// Uses HTTP PUT to `/v1/dictask:tasks/<task_id>`.
+/// Uses HTTP PUT to `/v1/dicta-task:tasks/<task_id>`.
 /// Fail-open: caller should log the error and continue with SQLite.
 pub fn persistTask(allocator: std.mem.Allocator, task: TaskRecord) !void {
     const base_url = std.posix.getenv("VERISIMDB_URL") orelse DEFAULT_URL;

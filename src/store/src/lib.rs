@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: MPL-2.0
 // Copyright (c) 2026 Jonathan D.A. Jewell (hyperpolymath) <j.d.a.jewell@open.ac.uk>
 //
-//! dictask store: SQLite canonical task store and view generation.
+//! dicta-task store: SQLite canonical task store and view generation.
 //!
 //! This is the single source of truth for all tasks. All reads and writes
 //! go through this module. Views (Markdown, JSON, CSV) are generated from
@@ -35,7 +35,7 @@ pub fn generate_markdown_view(conn: &Connection) -> Result<String> {
          ORDER BY priority_score DESC"
     )?;
 
-    let mut output = String::from("# dictask — Active Tasks\n\n");
+    let mut output = String::from("# dicta-task — Active Tasks\n\n");
     output.push_str("| Priority | Title | Status | Due Date | Project | Review |\n");
     output.push_str("|----------|-------|--------|----------|---------|--------|\n");
 

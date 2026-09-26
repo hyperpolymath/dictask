@@ -1,0 +1,78 @@
+// SPDX-License-Identifier: CC-BY-SA-4.0
+// Copyright (c) 2026 Jonathan D.A. Jewell (hyperpolymath) <j.d.a.jewell@open.ac.uk>
+= ADR-0004: Keep SQLite as the canonical store; put LMDB behind a trait later
+
+Date: 2026-09-26
+
+== Status
+
+Accepted
+
+== Context
+
+The canonical task store (`src/store`, schema in
+`src/definitions/schemas/tasks.sql`) is SQLite in WAL mode. The question came
+up of switching to LMDB now, so the project can be extended more easily later.
+
+What the store has to do today:
+
+* *Relational integrity.* `transcripts → audio_files`, `candidate_intents →
+  transcripts`, `tasks → candidate_intents`, plus `supersedes_task_id` and
+  `duplicate_of_task_id` self-references. Foreign keys and `CHECK`
+  constraints (status, review state, confidence in [0,1]) enforce these
+  inside the database.
+* *Ad-hoc queries and views.* The Markdown/JSON/CSV views are
+  `WHERE status NOT IN (...) ORDER BY priority_score DESC`. Review queues,
+  dedup candidate lookup (by project/title) and audit history are more of the
+  same.
+* *Auditability.* The data has to be inspectable with standard tools
+  (`sqlite3`, Datasette, backups as a single file).
+* *Low write volume.* A few recordings a day produce tens of rows. There is one
+  writer (the pipeline) and a few readers (views, review UI).
+
+LMDB is a memory-mapped, ordered key-value B+tree. It is extremely fast at
+reads, supports multiple readers with a single writer, and gives crash-safe
+copy-on-write. But it has no schema, no query language, no constraints, no
+secondary indexes and no joins. Every one of those would have to be
+hand-written in Rust (e.g. with `heed`), including index maintenance and
+migrations. You also have to choose the map size ahead of time.
+
+== Decision
+
+1. *SQLite stays the canonical source of truth.* We are not switching to LMDB.
+2. *Make the backend swappable instead.* Extract a `TaskStore` trait in
+   `src/store` (insert/update/query tasks, record intents, append audit
+   events, iterate for views) and make the current rusqlite code its first
+   implementation. Nothing outside `src/store` may issue SQL directly.
+3. *Where LMDB fits later.* If one of these workloads turns up, add an
+   LMDB-backed implementation or *side store* behind the same trait, not a
+   replacement:
+   * a high-rate embedding/semantic-dedup cache (vector → task id),
+   * a content-addressed audio/transcript blob index keyed by SHA-256,
+   * an embedded, read-heavy replica for a UI or FFI consumer.
+4. Federation/replication is already sketched through VeriSimDB
+   (`src/interface/ffi/src/verisimdb.zig`) as a *secondary* write target. It
+   should also go through the trait.
+
+== Consequences
+
+=== Positive
+
+* The integrity rules stay declarative and are enforced by the database.
+* Views and review queries remain one-line SQL.
+* The trait gives the extensibility that was the reason for considering LMDB,
+  without paying LMDB's costs now.
+* SQLite files are portable, easy to back up and easy to inspect for audit.
+
+=== Negative
+
+* SQLite allows one writer at a time. That is fine for this pipeline but would
+  need revisiting for multi-device concurrent writes.
+* The trait layer is a small amount of extra code.
+
+=== Revisit when
+
+* the store has more than one concurrent writer process, or
+* semantic dedup needs sub-millisecond lookups over large embedding sets, or
+* profiling shows SQLite as the pipeline bottleneck (target: under 5 minutes
+  end-to-end per recording).

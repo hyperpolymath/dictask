@@ -1,3 +1,4 @@
+# This workflow is managed by gh actions-lock.
 # SPDX-License-Identifier: MPL-2.0
 # Dormant push-email notification. ARMED by setting the repo variable
 # PUSH_EMAIL_ENABLED=true (the single on/off switch). Addresses are pre-filled;
@@ -11,7 +12,7 @@
 name: Push email notification
 on:
   push:
-    # Branch pushes only: tag and deletion payloads mislabel Branch:/head_commit.
+    # Branch pushes only; the job condition separately excludes branch deletions.
     branches: ['**']
 concurrency:
   # Deliberately per-RUN, so no run is ever queued behind another and none is
@@ -27,23 +28,23 @@ concurrency:
   # is still a cap whereas a per-run group needs none.
   # Verified with zizmor 1.30.0: deleting this block raises concurrency-limits;
   # this form silences it exactly as a shared group would.
-  group: push-email-${{ github.run_id }}
+  group: push-email-${{ github.run_id }}-${{ github.run_attempt }}
   cancel-in-progress: false
-permissions:
-  contents: read
+permissions: {}
 jobs:
   notify:
     name: Email on push
-    if: ${{ vars.PUSH_EMAIL_ENABLED == 'true' }}
+    if: ${{ vars.PUSH_EMAIL_ENABLED == 'true' && github.event.deleted != true }}
     runs-on: ubuntu-latest
     timeout-minutes: 5
     steps:
       - name: Send push notification email
-        uses: hyperpolymath/smtp-notify-action@22e7bdb322c430c1d0dac6b3bb307f4bb139d0be # v0.3.0
+        uses: hyperpolymath/smtp-notify-action@v0.3.0 # NOSONAR — pin authority is actions.lock (sha1-22e7bdb322c430c1d0dac6b3bb307f4bb139d0be)
         with:
           server_address: ${{ secrets.SMTP_HOST }}
           server_port: ${{ secrets.SMTP_PORT }}
-          secure: true
+          # Standard submission uses mandatory STARTTLS; other ports retain implicit TLS.
+          secure: ${{ secrets.SMTP_PORT == '587' && 'starttls' || 'implicit' }}
           username: ${{ secrets.SMTP_USER }}
           password: ${{ secrets.SMTP_PASS }}
           from: "GitHub Push <${{ secrets.SMTP_USER }}>"

@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: CC-BY-SA-4.0
+// Copyright (c) Jonathan D.A. Jewell <j.d.a.jewell@open.ac.uk>
 = Quickstart
 :toc: preamble
 
@@ -13,10 +15,10 @@ Get up and running in 60 seconds.
 
 [source,bash]
 ----
-git clone https://github.com/hyperpolymath/rsr-template-repo my-project
+git clone https://github.com/hyperpolymath/dicta-task my-project
 cd my-project
 rm -rf .git && git init -b main
-just init       # interactive placeholder replacement
+just repo-init       # interactive placeholder replacement
 ----
 
 == Project Structure

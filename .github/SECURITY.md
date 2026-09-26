@@ -1,4 +1,15 @@
+<!--
+SPDX-License-Identifier: CC-BY-SA-4.0
+Copyright (c) Jonathan D.A. Jewell <j.d.a.jewell@open.ac.uk>
+-->
 # Security Policy
+
+<!--
+The token vocabulary lives in .machine_readable/ai/PLACEHOLDERS.adoc, not here.
+This file used to restate it in a "delete before publishing" block, but `just
+init` substitutes tokens inside comments too — so the block's own instructions
+were rewritten into nonsense and then shipped, because nothing deleted it.
+-->
 
 We take security seriously. We appreciate your efforts to responsibly disclose vulnerabilities and will make every effort to acknowledge your contributions.
 
@@ -22,7 +33,7 @@ We take security seriously. We appreciate your efforts to responsibly disclose v
 
 The preferred method for reporting security vulnerabilities is through GitHub's Security Advisory feature:
 
-1. Navigate to [Report a Vulnerability](https://github.com/hyperpolymath/dictask/security/advisories/new)
+1. Navigate to [Report a Vulnerability](https://github.com/hyperpolymath/dicta-task/security/advisories/new)
 2. Click **"Report a vulnerability"**
 3. Complete the form with as much detail as possible
 4. Submit — we'll receive a private notification
@@ -34,15 +45,17 @@ This method ensures:
 - Coordinated disclosure tooling
 - Automatic credit when the advisory is published
 
-### Alternative: Encrypted Email
+### Alternative: Email
 
 If you cannot use GitHub Security Advisories, you may email us directly:
 
 | | |
 |---|---|
-| **Email** | 6759885+hyperpolymath@users.noreply.github.com |
-| **Fingerprint** | `[PGP fingerprint not set]` |
+| **Email** | j.d.a.jewell@open.ac.uk |
 
+This mailbox is not encrypted. For anything sensitive enough to need
+encryption, prefer GitHub Security Advisories above — the report stays private
+to the maintainers until an advisory is published.
 
 > **⚠️ Important:** Do not report security vulnerabilities through public GitHub issues, pull requests, discussions, or social media.
 
@@ -174,7 +187,7 @@ If we cannot reach agreement on disclosure timing, we default to 90 days from yo
 
 The following are within scope for security research:
 
-- This repository (`hyperpolymath/dictask`) and all its code
+- This repository (`hyperpolymath/dicta-task`) and all its code
 - Official releases and packages published from this repository
 - Documentation that could lead to security issues
 - Build and deployment configurations in this repository
@@ -293,8 +306,8 @@ Recognition includes:
 To stay informed about security updates:
 
 - **Watch this repository**: Click "Watch" → "Custom" → Select "Security alerts"
-- **GitHub Security Advisories**: Published at [Security Advisories](https://github.com/hyperpolymath/dictask/security/advisories)
-- **Release notes**: Security fixes noted in [CHANGELOG](CHANGELOG.md)
+- **GitHub Security Advisories**: Published at [Security Advisories](https://github.com/hyperpolymath/dicta-task/security/advisories)
+- **Release notes**: Security fixes noted in [CHANGELOG](../CHANGELOG.md)
 
 ### Update Policy
 
@@ -319,7 +332,7 @@ To stay informed about security updates:
 
 ## Security Best Practices
 
-When using Dictask, we recommend:
+When using dicta-task, we recommend:
 
 ### General
 
@@ -341,8 +354,8 @@ When using Dictask, we recommend:
 
 ## Additional Resources
 
-- [Security Advisories](https://github.com/hyperpolymath/dictask/security/advisories)
-- [Changelog](CHANGELOG.md)
+- [Security Advisories](https://github.com/hyperpolymath/dicta-task/security/advisories)
+- [Changelog](../CHANGELOG.md)
 - [Contributing Guidelines](CONTRIBUTING.md)
 - [CVE Database](https://cve.mitre.org/)
 - [CVSS Calculator](https://www.first.org/cvss/calculator/3.1)
@@ -353,9 +366,9 @@ When using Dictask, we recommend:
 
 | Purpose | Contact |
 |---------|---------|
-| **Security issues** | [Report via GitHub](https://github.com/hyperpolymath/dictask/security/advisories/new) or 6759885+hyperpolymath@users.noreply.github.com |
-| **General questions** | [GitHub Discussions](https://github.com/hyperpolymath/dictask/discussions) |
-| **Other enquiries** | See [README](README.md) for contact information |
+| **Security issues** | [Report via GitHub](https://github.com/hyperpolymath/dicta-task/security/advisories/new) or j.d.a.jewell@open.ac.uk |
+| **General questions** | [GitHub Discussions](https://github.com/hyperpolymath/dicta-task/discussions) |
+| **Other enquiries** | See [README](../README.adoc) for contact information |
 
 ---
 
@@ -369,7 +382,7 @@ This security policy may be updated from time to time. Significant changes will 
 
 ---
 
-*Thank you for helping keep Dictask and its users safe.* 🛡️
+*Thank you for helping keep dicta-task and its users safe.* 🛡️
 
 ---
 
