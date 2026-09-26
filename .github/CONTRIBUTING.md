@@ -47,7 +47,7 @@ dictask/
 ├── SECURITY.md
 ├── flake.guix            # Guix flake — fallback (Perimeter 1)
 ├── guix.scm             # Guix package — primary (Perimeter 1)
-└── Justfile             # Task runner (Perimeter 1)
+└── Justfile             # Task runner
 ```
 
 ---
