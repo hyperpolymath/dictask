@@ -10,6 +10,114 @@
   :canonical-name "dicta-task"
   :beholding-chora #u5"estate/chora"
   :repo-uuid #u5"github.com/hyperpolymath/dicta-task"
+  ; Identity, clade, forges, lineage, status, maturity, ecosystem, agentic and
+  ; anchor: carried verbatim from the former CLADE, ECOSYSTEM, STATE, AGENTIC and
+  ; ANCHOR records under .machine_readable/descriptiles/ (supervised pilot, owner
+  ; exception to D313; kyX remains the intended converter). Gaps are listed in
+  ; the pull request that added this block.
+  (identity
+    :primary-forge github
+    :owner "hyperpolymath"
+    :prefixed-name "ap-dicta-task")
+  (clade
+    :primary ap
+    :primary-name "Applications"
+    :secondary ()
+    :assigned "2026-03-16"
+    :rationale "Personal ambient automation: turns recorder voice notes into a prioritised task list without manual entry.")
+  (forges
+    :github "hyperpolymath/dicta-task"
+    :gitlab "hyperpolymath/dicta-task"
+    :bitbucket "hyperpolymath/dicta-task")
+  (lineage
+    :type standalone
+    :parent ""
+    :born "2026-03-14"
+    :previous-names ("dictask")
+    :instantiated-from "rsr-template-repo")
+  (status
+    :phase active
+    :since "2026-09-26"
+    :present #t
+    :aliases ()
+    :merged-into ""
+    :superseded-by ""
+    :successors ()
+    :ended "")
+  (maturity
+    :level experimental)
+  (ecosystem
+    :project "dicta-task"
+    :purpose "Speech-to-do pipeline: portable recorder → transcription → NLP parsing → prioritised task list"
+    :not ("a cloud dictation service (ASR runs offline; cloud is encrypted backup only)"
+          "a general note-taking app"
+          "a template (it is minted from rsr-template-repo)")
+    :pipeline-position "leaf"
+    :chain "standards → rsr-template-repo → dicta-task"
+    :coordination standards
+    (related :name "rsr-template-repo" :relationship template-parent :notes "Scaffolding this repo is minted from; see VARIANT.a2ml parent-pin.")
+    (related :name "ambientops" :relationship sibling-standard :notes "Personal sysadmin/automation — dicta-task is an ambientops workflow")
+    (related :name "proven" :relationship dependency :notes "Formally verified safety modules for audio processing and crypto")
+    (related :name "verisimdb" :relationship potential-consumer :notes "Secondary replica / federation of the task store (src/interface/ffi/src/verisimdb.zig)")
+    (related :name "panll" :relationship potential-consumer :notes "Review queue could surface as a PanLL panel")
+    (related :name "hypatia" :relationship dependency :notes "CI/CD scanning for the pipeline")
+    (related :name "gitbot-fleet" :relationship dependency :notes "Bot orchestration for automated pipeline steps")
+    (related :name "stapeln" :relationship dependency :notes "Container ecosystem for deployment"))
+  (agentic
+    :version "0.1.0"
+    :last-updated "2026-04-11"
+    (permissions :source #t :tests #t :docs #t :config #t :create-files #t)
+    (integrity
+      :fail-closed #t
+      :require-evidence-per-step #t
+      :allow-silent-skip #f
+      :require-rerun-after-fix #t
+      :release-claim-requires-hard-pass #t)
+    (methodology :instructions-dir ".machine_readable/bot_directives/" :default-mode hybrid))
+  (anchor
+    :schema "hyperpolymath.anchor/1"
+    :repo "hyperpolymath/dicta-task"
+    :authority "upstream-canonical"
+    :purpose (
+      "Define canonical semantics and policy boundaries for this repository."
+      "Declare what downstream/satellite repos can extend but not redefine."
+      "Provide a stable golden path and invariant contract for release readiness."
+      )
+    (metadata
+      :version "1.0.0"
+      :last-updated "2026-09-26")
+    (identity
+      :project "Dicta-Task"
+      :kind "service"
+      :one-sentence "Speech-to-do pipeline: portable recorder to transcription to NLP parsing to prioritised task list"
+      :domain "personal productivity: speech-to-task automation")
+    (semantic-authority
+      :policy "canonical"
+      :owns (
+        "Project semantics and specification"
+        "Invariant definitions and contractiles"
+        "Reference implementation behavior"
+        ))
+    (implementation-policy
+      :allowed ("Rust" "Idris2" "Zig" "Scheme" "Shell" "Just" "AsciiDoc" "Markdown")
+      :forbidden ("Node.js" "npm"))
+    (golden-path
+      :smoke-test-command ("just test" "just quality")
+      :success-criteria (
+        "Core tests pass"
+        "Quality gates pass"
+        "No unresolved critical security findings"
+        ))
+    (satellite-policy
+      :must-pin-upstream #t
+      :must-declare-authority #t
+      :must-have-anchor #t
+      :must-have-golden-path #t)
+    (semantic-authority-files
+      :language-spec "SPECIFICATION.md"
+      :formal-proofs "docs/proofs/PROOFS.adoc"
+      :type-theory "docs/theory/THEORY.adoc"
+      :algorithms "docs/theory/ALGORITHMS.adoc"))
   (manifest
     :version "0.1.0"
     :last-updated "2026-09-26"

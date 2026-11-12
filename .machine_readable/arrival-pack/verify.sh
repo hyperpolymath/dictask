@@ -3,7 +3,7 @@
 # Copyright (c) 2026 Jonathan D.A. Jewell (hyperpolymath) <j.d.a.jewell@open.ac.uk>
 #
 # verify.sh — drift check for the CLAUDE.md arrival pack (the runnable side of
-# claude-md.k9.ncl). Regenerates the region from a2ml and byte-compares it to the
+# claude-md.k9.ncl). Regenerates the region from the deed and byte-compares it to the
 # committed region. Non-zero exit on drift or hand-edit. Wire into CI/pre-commit.
 set -euo pipefail
 
@@ -13,12 +13,12 @@ TARGET="$ROOT/CLAUDE.md"
 
 [ -f "$TARGET" ] || { echo "DRIFT: CLAUDE.md missing — run \`just claude-md\`"; exit 1; }
 
-bash "$AP/extract.sh" "$ROOT/.machine_readable/descriptiles" > "$AP/claude-md-data.json"
+bash "$AP/extract.sh" "$ROOT" > "$AP/claude-md-data.json"
 fresh="$(nickel export --format raw "$AP/arrival-pack.ncl")"
 committed="$(awk '/<!-- ARRIVAL-PACK:BEGIN/{f=1} f{print} /ARRIVAL-PACK:END/{f=0}' "$TARGET")"
 
 if [ "$fresh" = "$committed" ]; then
-  echo "OK: CLAUDE.md arrival pack is in sync with a2ml."
+  echo "OK: CLAUDE.md arrival pack is in sync with the deed."
 else
   echo "DRIFT: CLAUDE.md arrival-pack region is stale or hand-edited."
   echo "       Run \`just claude-md\` to regenerate. Diff (committed → fresh):"
