@@ -7,7 +7,7 @@ workflows:
         - 'actions/checkout@v7.0.1'
     '.github/workflows/codeql.yml':
         - 'actions/checkout@v7.0.1'
-        - 'github/codeql-action@33d7b85da1a04171e211befe2c739303b9a4c066'
+        - 'github/codeql-action@915412ff23e8b7659517e607487dbeae018f2934'
     '.github/workflows/deed-validate.yml':
         - 'actions/checkout@v7.0.1'
         - 'hyperpolymath/deed-ecosystem@main'
@@ -81,7 +81,7 @@ workflows:
         - 'actions/checkout@v7.0.1'
     '.github/workflows/sonarqube.yml':
         - 'actions/checkout@v7.0.1'
-        - 'sonarsource/sonarqube-scan-action@v8.5.0'
+        - 'sonarsource/sonarqube-scan-action@v8.5.1'
     '.github/workflows/static-analysis-gate.yml':
         - 'actions/checkout@v7.0.1'
         - 'actions/download-artifact@v8.0.2'
@@ -190,9 +190,9 @@ dependencies:
         commit: 'sha1-54075bcc5e249e4758d363f27d099f55d843f124'
         owner_id: 47606891
         repo_id: 331103973
-    'github/codeql-action@33d7b85da1a04171e211befe2c739303b9a4c066':
-        ref: 'v4.39.3'
-        commit: 'sha1-33d7b85da1a04171e211befe2c739303b9a4c066'
+    'github/codeql-action@915412ff23e8b7659517e607487dbeae018f2934':
+        ref: 'v4.39.5'
+        commit: 'sha1-915412ff23e8b7659517e607487dbeae018f2934'
         owner_id: 9919
         repo_id: 259445878
     'github/codeql-action@cdf488f595d80d6e07e03d4674febd5ab45fa938':
@@ -270,9 +270,9 @@ dependencies:
         commit: 'sha1-8a0cd651e5b2365bd640854a3fa5dfc70e4875f3'
         owner_id: 2242
         repo_id: 204253808
-    'sonarsource/sonarqube-scan-action@v8.5.0':
-        ref: 'v8.5.0'
-        commit: 'sha1-59202af334b4ba7b5db01b701b8e79f8b3bef0f4'
+    'sonarsource/sonarqube-scan-action@v8.5.1':
+        ref: 'v8.5.1'
+        commit: 'sha1-70bad232163b09d998ea0707ee80c0ec80798c16'
         owner_id: 545988
         repo_id: 366408409
     'swatinem/rust-cache@6323deb102c322ba6fcbdcafc7e3dddab59af2b6':
